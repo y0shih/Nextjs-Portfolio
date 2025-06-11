@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { Github, ExternalLink, Code2, Database, Globe, ChevronDown } from "lucide-react";
+import Link from "next/link";
+import { projects } from "@/data/projects";
 
 interface Project {
   title: string;
@@ -13,51 +15,17 @@ interface Project {
   liveUrl?: string;
   image?: string;
   type: "web-app" | "software" | "fullstack";
+  slug: string;
 }
 
 const ProjectsSection: React.FC = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
-  const toggleDropdown = (projectTitle: string) => {
+  const toggleDropdown = (projectTitle: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     setActiveDropdown(activeDropdown === projectTitle ? null : projectTitle);
   };
-
-  const projects: Project[] = [
-    {
-      title: "MeoStationery - E-Commerce Web App",
-      description:
-        "A full-stack e-commerce platform built with Next.js, Node.js, Prisma and PostgreSQL. Features include real-time inventory management, payment processing, and admin dashboard.",
-      technologies: ["Next.js", "Node.js", "PostgreSQL", "Tembo.io", "Prisma"],
-      githubUrl: "https://github.com/Goatt69/meo_stationery",
-      liveUrl: "https://meostationery.netlify.app/",
-      type: "fullstack",
-    },
-    {
-      title: "Deadlock ESP - Game Cheating Software ",
-      description: "A cheat software built mainly in Rust and C#",
-      technologies: ["C++", "C#", ".NET", "Rust"],
-      githubUrl: "https://github.com/y0shih/deadlock-cheese",
-      type: "software",
-    },
-    {
-      title: "WyA - Real-time Location Chatting Platform",
-      description:
-        "WyA is a real-time location-based chat app where users can join nearby chat rooms. Built with Ionic React, TypeScript, Nodejs with smooth animations powered by Framer Motion.",
-      technologies: ["Ionic React", "TypeScript", "Nodejs", "Firebase"],
-      githubUrlFE: "https://github.com/duy08k4/WyA_Frontend",
-      githubUrlBE: "https://github.com/duy08k4/WyA_Backend",
-      liveUrl: "https://wy-a-introduction.vercel.app/",
-      type: "web-app",
-    },
-    {
-      title: "Portfolio Website",
-      description:
-        "A modern portfolio website showcasing projects and skills. Built with Next.js and Tailwind CSS, featuring smooth animations and responsive design.",
-      technologies: ["Next.js", "TypeScript", "Tailwind CSS", "Framer Motion"],
-      liveUrl: "https://nextjs-portfolio-u735.vercel.app/",
-      type: "web-app",
-    },
-  ];
 
   const getProjectIcon = (type: Project["type"]) => {
     switch (type) {
@@ -92,20 +60,21 @@ const ProjectsSection: React.FC = () => {
             const hasMultipleRepos = project.githubUrlFE && project.githubUrlBE;
             
             return (
-              <div
+              <Link
                 key={project.title}
-                className="glass-card glass-hover rounded-xl p-6 fade-in-up"
+                href={`/projects/${project.slug}`}
+                className="glass-card glass-hover rounded-xl p-6 fade-in-up transition-transform hover:scale-[1.02] block"
                 style={{ animationDelay: `${index * 150}ms` }}
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="glass-card rounded-lg p-2">
                     <ProjectIcon className="w-5 h-5 text-primary" />
                   </div>
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
                     {hasMultipleRepos ? (
                       <div className="relative">
                         <button
-                          onClick={() => toggleDropdown(project.title)}
+                          onClick={(e) => toggleDropdown(project.title, e)}
                           className="glass-card glass-hover rounded-lg p-2 hover:scale-110 transition-transform flex items-center space-x-1"
                         >
                           <Github className="w-5 h-5 text-foreground" />
@@ -119,6 +88,7 @@ const ProjectsSection: React.FC = () => {
                               target="_blank"
                               rel="noopener noreferrer"
                               className="block px-4 py-2 text-sm text-foreground hover:bg-primary/10 transition-colors"
+                              onClick={(e) => e.stopPropagation()}
                             >
                               Front-end Repository
                             </a>
@@ -127,6 +97,7 @@ const ProjectsSection: React.FC = () => {
                               target="_blank"
                               rel="noopener noreferrer"
                               className="block px-4 py-2 text-sm text-foreground hover:bg-primary/10 transition-colors border-t border-primary/10"
+                              onClick={(e) => e.stopPropagation()}
                             >
                               Back-end Repository
                             </a>
@@ -139,6 +110,7 @@ const ProjectsSection: React.FC = () => {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="glass-card glass-hover rounded-lg p-2 hover:scale-110 transition-transform"
+                        onClick={(e) => e.stopPropagation()}
                       >
                         <Github className="w-5 h-5 text-foreground" />
                       </a>
@@ -149,6 +121,7 @@ const ProjectsSection: React.FC = () => {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="glass-card glass-hover rounded-lg p-2 hover:scale-110 transition-transform"
+                        onClick={(e) => e.stopPropagation()}
                       >
                         <ExternalLink className="w-5 h-5 text-foreground" />
                       </a>
@@ -173,7 +146,7 @@ const ProjectsSection: React.FC = () => {
                     </span>
                   ))}
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>

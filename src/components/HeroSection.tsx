@@ -25,7 +25,7 @@ const HeroSection: React.FC = () => {
         
         {/* Node.js Logo */}
         <div className="absolute bottom-40 right-32 w-22 h-22 glass-card rounded-xl floating-delayed opacity-30 flex items-center justify-center">
-          <div className="text-sm font-bold text-green-400">NODE</div>
+          <div className="text-sm font-bold text-green-400">1337</div>
         </div>
         
         {/* Python Logo */}

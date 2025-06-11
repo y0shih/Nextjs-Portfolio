@@ -7,13 +7,39 @@ const REDIRECT_URI = process.env.NEXT_PUBLIC_BASE_URL + '/api/spotify/callback';
 
 // GET /api/spotify/callback - Handle the OAuth callback
 export async function GET(request: Request) {
+  console.log('[Callback Route] Request URL:', request.url);
+  console.log('[Callback Route] Request headers:', Object.fromEntries(request.headers.entries()));
+  
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
   const state = searchParams.get('state');
+  
+  console.log('[Callback Route] Raw cookie header:', request.headers.get('cookie'));
   const cookieStore = await cookies();
+  console.log('[Callback Route] All available cookies:', cookieStore.getAll().map(c => ({
+    name: c.name,
+    value: c.value
+  })));
+  
   const storedState = cookieStore.get('spotify_auth_state')?.value;
+  console.log('[Callback Route] State validation details:', {
+    receivedState: state,
+    storedState: storedState,
+    hasCode: !!code,
+    hasState: !!state,
+    hasStoredState: !!storedState,
+    statesMatch: state === storedState,
+    cookieExists: !!cookieStore.get('spotify_auth_state')
+  });
 
   if (!code || !state || !storedState || state !== storedState) {
+    console.log('[Callback Route] State validation failed:', {
+      hasCode: !!code,
+      hasState: !!state,
+      hasStoredState: !!storedState,
+      statesMatch: state === storedState,
+      cookieExists: !!cookieStore.get('spotify_auth_state')
+    });
     return new NextResponse('Invalid state parameter', { status: 400 });
   }
 

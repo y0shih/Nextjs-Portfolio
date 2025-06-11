@@ -54,11 +54,11 @@ const AboutSection: React.FC = () => {
         <div className="mt-16 glass-card rounded-2xl p-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div className="fade-in-up" style={{ animationDelay: '600ms' }}>
-              <div className="text-4xl font-bold text-primary mb-2">5+</div>
+              <div className="text-4xl font-bold text-primary mb-2">2+</div>
               <div className="text-muted-foreground">Years Experience</div>
             </div>
             <div className="fade-in-up" style={{ animationDelay: '700ms' }}>
-              <div className="text-4xl font-bold text-primary mb-2">50+</div>
+              <div className="text-4xl font-bold text-primary mb-2">30+</div>
               <div className="text-muted-foreground">Projects Completed</div>
             </div>
             <div className="fade-in-up" style={{ animationDelay: '800ms' }}>
