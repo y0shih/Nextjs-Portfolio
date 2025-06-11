@@ -6,7 +6,7 @@ const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 
 // POST /api/spotify/refresh - Refresh the access token
 export async function POST() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const refreshToken = cookieStore.get('spotify_refresh_token')?.value;
 
   if (!refreshToken) {
