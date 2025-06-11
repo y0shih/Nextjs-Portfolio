@@ -5,6 +5,14 @@ const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 // const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 const REDIRECT_URI = process.env.NEXT_PUBLIC_BASE_URL + '/api/spotify/callback';
 
+// Add CORS headers to response
+const addCorsHeaders = (response: NextResponse) => {
+  response.headers.set('Access-Control-Allow-Origin', '*');
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  return response;
+};
+
 // Generate a random string for state parameter
 const generateRandomString = (length: number) => {
   const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -18,7 +26,7 @@ const generateRandomString = (length: number) => {
 // GET /api/spotify/auth - Start the OAuth flow
 export async function GET() {
   if (!SPOTIFY_CLIENT_ID) {
-    return new NextResponse('Spotify client ID not configured', { status: 500 });
+    return addCorsHeaders(new NextResponse('Spotify client ID not configured', { status: 500 }));
   }
 
   const state = generateRandomString(16);
@@ -33,7 +41,8 @@ export async function GET() {
     'user-read-currently-playing',
     'streaming',
     'playlist-read-private',
-    'playlist-read-collaborative'
+    'playlist-read-collaborative',
+    'user-library-read'
   ].join(' ');
 
   const params = new URLSearchParams({
@@ -68,5 +77,10 @@ export async function GET() {
   const setCookieHeader = response.headers.get('set-cookie');
   console.log('[Auth Route] Set-Cookie header:', setCookieHeader);
 
-  return response;
+  return addCorsHeaders(response);
+}
+
+// Handle OPTIONS request for CORS preflight
+export async function OPTIONS() {
+  return addCorsHeaders(new NextResponse(null, { status: 204 }));
 } 

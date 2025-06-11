@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 
 // Define the type for our song metadata
 export interface Song {
@@ -10,27 +11,31 @@ export interface Song {
   coverUrl?: string;
 }
 
-// This would typically come from a database
-const PLAYLIST: Song[] = [
-  {
-    id: '1',
-    title: 'Sample Song 1',
-    artist: 'Artist 1',
-    duration: 180, // 3 minutes in seconds
-    url: '/api/music/stream/1',
-    coverUrl: '/images/covers/1.jpg'
-  },
-  {
-    id: '2',
-    title: 'Sample Song 2',
-    artist: 'Artist 2',
-    duration: 240, // 4 minutes in seconds
-    url: '/api/music/stream/2',
-    coverUrl: '/images/covers/2.jpg'
-  }
-];
-
-// GET /api/music - Get the playlist
+// GET /api/music - Get the liked songs
 export async function GET() {
-  return NextResponse.json({ playlist: PLAYLIST });
+  const cookieStore = cookies();
+  const accessToken = cookieStore.get('spotify_access_token')?.value;
+
+  if (!accessToken) {
+    return new NextResponse('No access token', { status: 401 });
+  }
+
+  try {
+    // Fetch liked songs from our new endpoint
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/spotify/liked-songs`, {
+      headers: {
+        'Cookie': `spotify_access_token=${accessToken}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch liked songs');
+    }
+
+    const data = await response.json();
+    return NextResponse.json({ playlist: data.songs });
+  } catch (error) {
+    console.error('Error fetching liked songs:', error);
+    return new NextResponse('Failed to fetch liked songs', { status: 500 });
+  }
 } 

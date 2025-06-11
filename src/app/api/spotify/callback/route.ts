@@ -1,6 +1,14 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
+// Add CORS headers to response
+const addCorsHeaders = (response: NextResponse) => {
+  response.headers.set('Access-Control-Allow-Origin', '*');
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  return response;
+};
+
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 const REDIRECT_URI = process.env.NEXT_PUBLIC_BASE_URL + '/api/spotify/callback';
@@ -40,7 +48,7 @@ export async function GET(request: Request) {
       statesMatch: state === storedState,
       cookieExists: !!cookieStore.get('spotify_auth_state')
     });
-    return new NextResponse('Invalid state parameter', { status: 400 });
+    return addCorsHeaders(new NextResponse('Invalid state parameter', { status: 400 }));
   }
 
   try {
@@ -66,9 +74,10 @@ export async function GET(request: Request) {
 
     // Store tokens in cookies
     const cookieOptions = {
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax' as const,
+      path: '/',
     };
 
     const responseObj = NextResponse.redirect(new URL('/', request.url));
@@ -88,9 +97,20 @@ export async function GET(request: Request) {
     // Clear the state cookie
     responseObj.cookies.delete('spotify_auth_state');
 
-    return responseObj;
+    console.log('[Callback Route] Setting cookies:', {
+      accessToken: !!data.access_token,
+      refreshToken: !!data.refresh_token,
+      cookieOptions
+    });
+
+    return addCorsHeaders(responseObj);
   } catch (error) {
     console.error('Error during token exchange:', error);
-    return new NextResponse('Failed to authenticate with Spotify', { status: 500 });
+    return addCorsHeaders(new NextResponse('Failed to authenticate with Spotify', { status: 500 }));
   }
+}
+
+// Handle OPTIONS request for CORS preflight
+export async function OPTIONS() {
+  return addCorsHeaders(new NextResponse(null, { status: 204 }));
 } 

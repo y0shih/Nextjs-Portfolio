@@ -91,6 +91,10 @@ interface SpotifyEventPayload {
   not_ready: { device_id: string };
 }
 
+interface Song {
+  url: string;
+}
+
 const MusicPlayer: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -108,93 +112,139 @@ const MusicPlayer: React.FC = () => {
 
   // Initialize Spotify Web Playback SDK
   useEffect(() => {
-    const initializePlayer = () => {
+    const initializePlayer = async () => {
+      console.log('[MusicPlayer] All cookies:', document.cookie);
+      
       const token = document.cookie
         .split('; ')
         .find(row => row.startsWith('spotify_access_token='))
         ?.split('=')[1];
 
+      console.log('[MusicPlayer] Token available:', !!token);
+      console.log('[MusicPlayer] Raw token value:', token ? `${token.substring(0, 10)}...` : 'none');
+
       if (!token) {
+        console.log('[MusicPlayer] No token found in cookies. Available cookies:', 
+          document.cookie.split('; ').map(c => c.split('=')[0]));
         setIsLoading(false);
         return;
       }
 
-      const player = new window.Spotify.Player({
-        name: 'Web Playback SDK',
-        getOAuthToken: (callback: (token: string) => void) => callback(token),
-        volume: volume / 100
-      });
-
-      // Error handling
-      player.addListener('initialization_error', ({ message }) => {
-        console.error('Failed to initialize:', message);
-        setIsLoading(false);
-      });
-
-      player.addListener('authentication_error', ({ message }) => {
-        console.error('Failed to authenticate:', message);
-        setIsAuthenticated(false);
-        setIsLoading(false);
-      });
-
-      player.addListener('account_error', ({ message }) => {
-        console.error('Failed to validate Spotify account:', message);
-        setIsLoading(false);
-      });
-
-      // Playback status updates
-      player.addListener('player_state_changed', (state) => {
-        if (!state) return;
-
-        setCurrentTrack(state.track_window.current_track);
-        setIsPlaying(!state.paused);
-        setCurrentTime(state.position);
-        setDuration(state.duration);
-        setProgress((state.position / state.duration) * 100);
-      });
-
-      // Ready
-      player.addListener('ready', ({ device_id }) => {
-        console.log('Ready with Device ID', device_id);
-        deviceIdRef.current = device_id;
-        setIsAuthenticated(true);
-        setIsLoading(false);
-
-        // Transfer playback to this device
-        fetch('https://api.spotify.com/v1/me/player', {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
+      try {
+        const player = new window.Spotify.Player({
+          name: 'Web Playback SDK',
+          getOAuthToken: (callback: (token: string) => void) => {
+            console.log('[MusicPlayer] Getting OAuth token');
+            callback(token);
           },
-          body: JSON.stringify({
-            device_ids: [device_id],
-            play: false
-          })
+          volume: volume / 100
         });
-      });
 
-      // Not Ready
-      player.addListener('not_ready', ({ device_id }) => {
-        console.log('Device ID has gone offline', device_id);
-      });
+        // Error handling
+        player.addListener('initialization_error', ({ message }) => {
+          console.error('[MusicPlayer] Failed to initialize:', message);
+          setIsLoading(false);
+        });
 
-      // Connect to the player
-      player.connect();
-      playerRef.current = player;
+        player.addListener('authentication_error', ({ message }) => {
+          console.error('[MusicPlayer] Failed to authenticate:', message);
+          setIsAuthenticated(false);
+          setIsLoading(false);
+        });
 
-      return () => {
-        player.disconnect();
-      };
+        player.addListener('account_error', ({ message }) => {
+          console.error('[MusicPlayer] Failed to validate Spotify account:', message);
+          setIsLoading(false);
+        });
+
+        // Playback status updates
+        player.addListener('player_state_changed', (state) => {
+          console.log('[MusicPlayer] Player state changed:', state);
+          if (!state) return;
+
+          setCurrentTrack(state.track_window.current_track);
+          setIsPlaying(!state.paused);
+          setCurrentTime(state.position);
+          setDuration(state.duration);
+          setProgress((state.position / state.duration) * 100);
+        });
+
+        // Ready
+        player.addListener('ready', async ({ device_id }) => {
+          console.log('[MusicPlayer] Ready with Device ID:', device_id);
+          deviceIdRef.current = device_id;
+          setIsAuthenticated(true);
+          setIsLoading(false);
+
+          try {
+            // Transfer playback to this device
+            const transferResponse = await fetch('https://api.spotify.com/v1/me/player', {
+              method: 'PUT',
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                device_ids: [device_id],
+                play: false
+              })
+            });
+
+            if (!transferResponse.ok) {
+              const errorData = await transferResponse.json();
+              console.error('[MusicPlayer] Failed to transfer playback:', errorData);
+            } else {
+              console.log('[MusicPlayer] Successfully transferred playback');
+              // Start playback after successful transfer
+              await startPlayback();
+            }
+          } catch (error) {
+            console.error('[MusicPlayer] Error transferring playback:', error);
+          }
+        });
+
+        // Not Ready
+        player.addListener('not_ready', ({ device_id }) => {
+          console.log('[MusicPlayer] Device ID has gone offline:', device_id);
+        });
+
+        // Connect to the player
+        console.log('[MusicPlayer] Attempting to connect player...');
+        const connected = await player.connect();
+        console.log('[MusicPlayer] Player connected:', connected);
+        
+        if (!connected) {
+          console.error('[MusicPlayer] Failed to connect player');
+          setIsLoading(false);
+          return;
+        }
+
+        playerRef.current = player;
+
+        return () => {
+          console.log('[MusicPlayer] Disconnecting player...');
+          player.disconnect();
+        };
+      } catch (error) {
+        console.error('[MusicPlayer] Error initializing player:', error);
+        setIsLoading(false);
+      }
     };
 
     // Set up the callback for when the SDK is ready
-    window.onSpotifyWebPlaybackSDKReady = initializePlayer;
+    window.onSpotifyWebPlaybackSDKReady = () => {
+      console.log('[MusicPlayer] SDK Ready, initializing player...');
+      initializePlayer();
+    };
 
     // Load the Spotify Web Playback SDK script
     const script = document.createElement('script');
     script.src = 'https://sdk.scdn.co/spotify-player.js';
     script.async = true;
+    script.onerror = (error) => {
+      console.error('[MusicPlayer] Failed to load Spotify SDK:', error);
+      setIsLoading(false);
+    };
     document.body.appendChild(script);
 
     return () => {
@@ -227,18 +277,35 @@ const MusicPlayer: React.FC = () => {
   }, [isPlaying]);
 
   const handlePlayPause = async () => {
+    console.log('[MusicPlayer] Play/Pause clicked, current state:', {
+      isPlaying,
+      hasPlayer: !!playerRef.current,
+      deviceId: deviceIdRef.current
+    });
+
+    if (!playerRef.current) {
+      console.error('[MusicPlayer] No player instance available');
+      return;
+    }
+
     if (!isExpanded) {
       setIsExpanded(true);
     }
 
-    if (!playerRef.current) return;
-
-    if (isPlaying) {
-      await playerRef.current.pause();
-    } else {
-      await playerRef.current.resume();
+    try {
+      if (isPlaying) {
+        console.log('[MusicPlayer] Attempting to pause...');
+        await playerRef.current.pause();
+        console.log('[MusicPlayer] Pause command sent');
+      } else {
+        console.log('[MusicPlayer] Attempting to resume...');
+        await playerRef.current.resume();
+        console.log('[MusicPlayer] Resume command sent');
+      }
+      setIsPlaying(!isPlaying);
+    } catch (error) {
+      console.error('[MusicPlayer] Error during play/pause:', error);
     }
-    setIsPlaying(!isPlaying);
   };
 
   const handleProgressChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -286,6 +353,69 @@ const MusicPlayer: React.FC = () => {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
+  // Add a function to start playback of liked songs
+  const startPlayback = async () => {
+    if (!playerRef.current || !deviceIdRef.current) {
+      console.error('[MusicPlayer] No player or device ID available');
+      return;
+    }
+
+    try {
+      const token = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('spotify_access_token='))
+        ?.split('=')[1];
+
+      if (!token) {
+        console.error('[MusicPlayer] No access token available');
+        return;
+      }
+
+      console.log('[MusicPlayer] Starting playback of liked songs...');
+      
+      // First, get the liked songs
+      const response = await fetch('/api/spotify/liked-songs', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch liked songs');
+      }
+
+      const data = await response.json();
+      const uris = data.songs.map((song: Song) => song.url);
+
+      if (uris.length === 0) {
+        console.error('[MusicPlayer] No liked songs found');
+        return;
+      }
+
+      // Start playback with the first 50 liked songs
+      const playResponse = await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceIdRef.current}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          uris: uris.slice(0, 50)
+        })
+      });
+
+      if (!playResponse.ok) {
+        const errorData = await playResponse.json();
+        console.error('[MusicPlayer] Failed to start playback:', errorData);
+      } else {
+        console.log('[MusicPlayer] Playback started successfully');
+        setIsPlaying(true);
+      }
+    } catch (error) {
+      console.error('[MusicPlayer] Error starting playback:', error);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50">
@@ -304,6 +434,19 @@ const MusicPlayer: React.FC = () => {
           className="glass-card glass-hover rounded-full px-6 py-3 transition-all duration-500 hover:scale-110 bg-primary/20"
         >
           <span className="text-sm font-medium text-primary">Connect Spotify</span>
+        </button>
+      </div>
+    );
+  }
+
+  if (!isExpanded && isAuthenticated && !isPlaying) {
+    return (
+      <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50">
+        <button 
+          onClick={startPlayback}
+          className="glass-card glass-hover rounded-full p-6 transition-all duration-500 hover:scale-110 bg-primary/20"
+        >
+          <Play className="w-4 h-4 text-primary" />
         </button>
       </div>
     );
