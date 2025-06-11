@@ -1,151 +1,310 @@
 "use client"
 import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Volume2 } from 'lucide-react';
-import type { Song } from '@/app/api/music/route';
+
+interface SpotifyPlayerConfig {
+  name: string;
+  getOAuthToken: (callback: (token: string) => void) => void;
+  volume: number;
+}
+
+interface SpotifyPlayer {
+  connect: () => Promise<boolean>;
+  disconnect: () => void;
+  addListener: <T extends SpotifyEventType>(
+    event: T,
+    callback: (state: SpotifyEventPayload[T]) => void
+  ) => void;
+  removeListener: (event: SpotifyEventType) => void;
+  getCurrentState: () => Promise<SpotifyPlaybackState | null>;
+  setName: (name: string) => Promise<void>;
+  getVolume: () => Promise<number>;
+  setVolume: (volume: number) => Promise<void>;
+  pause: () => Promise<void>;
+  resume: () => Promise<void>;
+  seek: (position_ms: number) => Promise<void>;
+  previousTrack: () => Promise<void>;
+  nextTrack: () => Promise<void>;
+}
+
+interface SpotifyPlaybackState {
+  context: {
+    uri: string;
+    metadata: Record<string, unknown>;
+  };
+  disallows: {
+    pausing: boolean;
+    peeking_next: boolean;
+    peeking_prev: boolean;
+    resuming: boolean;
+    seeking: boolean;
+    skipping_next: boolean;
+    skipping_prev: boolean;
+  };
+  duration: number;
+  paused: boolean;
+  position: number;
+  repeat_mode: number;
+  shuffle: boolean;
+  track_window: {
+    current_track: SpotifyTrack;
+    previous_tracks: SpotifyTrack[];
+    next_tracks: SpotifyTrack[];
+  };
+}
+
+declare global {
+  interface Window {
+    Spotify: {
+      Player: new (config: SpotifyPlayerConfig) => SpotifyPlayer;
+    };
+    onSpotifyWebPlaybackSDKReady: () => void;
+  }
+}
+
+interface SpotifyTrack {
+  uri: string;
+  name: string;
+  artists: Array<{ name: string }>;
+  duration_ms: number;
+  album: {
+    images: Array<{ url: string }>;
+  };
+}
+
+type SpotifyEventType = 
+  | 'initialization_error'
+  | 'authentication_error'
+  | 'account_error'
+  | 'playback_error'
+  | 'player_state_changed'
+  | 'ready'
+  | 'not_ready';
+
+interface SpotifyEventPayload {
+  initialization_error: { message: string };
+  authentication_error: { message: string };
+  account_error: { message: string };
+  playback_error: { message: string };
+  player_state_changed: SpotifyPlaybackState;
+  ready: { device_id: string };
+  not_ready: { device_id: string };
+}
 
 const MusicPlayer: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [volume, setVolume] = useState(75);
+  const [volume, setVolume] = useState(50);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [playlist, setPlaylist] = useState<Song[]>([]);
-  const [currentSongIndex, setCurrentSongIndex] = useState(0);
+  const [currentTrack, setCurrentTrack] = useState<SpotifyTrack | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const progressInterval = useRef<NodeJS.Timeout>();
+  const playerRef = useRef<SpotifyPlayer | null>(null);
+  const deviceIdRef = useRef<string | null>(null);
+  const progressIntervalRef = useRef<NodeJS.Timeout>();
 
-  // Fetch playlist on component mount
+  // Initialize Spotify Web Playback SDK
   useEffect(() => {
-    const fetchPlaylist = async () => {
-      try {
-        const response = await fetch('/api/music');
-        const data = await response.json();
-        setPlaylist(data.playlist);
-      } catch (error) {
-        console.error('Failed to fetch playlist:', error);
+    const initializePlayer = () => {
+      const token = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('spotify_access_token='))
+        ?.split('=')[1];
+
+      if (!token) {
+        setIsLoading(false);
+        return;
       }
-    };
-    fetchPlaylist();
-  }, []);
 
-  // Initialize audio element
-  useEffect(() => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
-      audioRef.current.addEventListener('timeupdate', handleTimeUpdate);
-      audioRef.current.addEventListener('loadedmetadata', handleLoadedMetadata);
-      audioRef.current.addEventListener('ended', handleSongEnd);
-    }
+      const player = new window.Spotify.Player({
+        name: 'Web Playback SDK',
+        getOAuthToken: (callback: (token: string) => void) => callback(token),
+        volume: volume / 100
+      });
+
+      // Error handling
+      player.addListener('initialization_error', ({ message }) => {
+        console.error('Failed to initialize:', message);
+        setIsLoading(false);
+      });
+
+      player.addListener('authentication_error', ({ message }) => {
+        console.error('Failed to authenticate:', message);
+        setIsAuthenticated(false);
+        setIsLoading(false);
+      });
+
+      player.addListener('account_error', ({ message }) => {
+        console.error('Failed to validate Spotify account:', message);
+        setIsLoading(false);
+      });
+
+      // Playback status updates
+      player.addListener('player_state_changed', (state) => {
+        if (!state) return;
+
+        setCurrentTrack(state.track_window.current_track);
+        setIsPlaying(!state.paused);
+        setCurrentTime(state.position);
+        setDuration(state.duration);
+        setProgress((state.position / state.duration) * 100);
+      });
+
+      // Ready
+      player.addListener('ready', ({ device_id }) => {
+        console.log('Ready with Device ID', device_id);
+        deviceIdRef.current = device_id;
+        setIsAuthenticated(true);
+        setIsLoading(false);
+
+        // Transfer playback to this device
+        fetch('https://api.spotify.com/v1/me/player', {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            device_ids: [device_id],
+            play: false
+          })
+        });
+      });
+
+      // Not Ready
+      player.addListener('not_ready', ({ device_id }) => {
+        console.log('Device ID has gone offline', device_id);
+      });
+
+      // Connect to the player
+      player.connect();
+      playerRef.current = player;
+
+      return () => {
+        player.disconnect();
+      };
+    };
+
+    window.onSpotifyWebPlaybackSDKReady = initializePlayer;
+
+    // Load the Spotify Web Playback SDK script
+    const script = document.createElement('script');
+    script.src = 'https://sdk.scdn.co/spotify-player.js';
+    script.async = true;
+    document.body.appendChild(script);
+
     return () => {
-      if (audioRef.current) {
-        audioRef.current.removeEventListener('timeupdate', handleTimeUpdate);
-        audioRef.current.removeEventListener('loadedmetadata', handleLoadedMetadata);
-        audioRef.current.removeEventListener('ended', handleSongEnd);
-      }
+      document.body.removeChild(script);
     };
   }, []);
 
-  // Update audio source when current song changes
+  // Update progress every second
   useEffect(() => {
-    if (audioRef.current && playlist.length > 0) {
-      const currentSong = playlist[currentSongIndex];
-      audioRef.current.src = currentSong.url;
-      if (isPlaying) {
-        audioRef.current.play();
+    if (isPlaying) {
+      progressIntervalRef.current = setInterval(() => {
+        if (playerRef.current) {
+          playerRef.current.getCurrentState().then((state: any) => {
+            if (state) {
+              setCurrentTime(state.position);
+              setProgress((state.position / state.duration) * 100);
+            }
+          });
+        }
+      }, 1000);
+    }
+
+    return () => {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
       }
-    }
-  }, [currentSongIndex, playlist]);
-
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      const current = audioRef.current.currentTime;
-      const total = audioRef.current.duration;
-      setCurrentTime(current);
-      setProgress((current / total) * 100);
-    }
-  };
-
-  const handleLoadedMetadata = () => {
-    if (audioRef.current) {
-      setDuration(audioRef.current.duration);
-    }
-  };
-
-  const handleSongEnd = () => {
-    if (currentSongIndex < playlist.length - 1) {
-      setCurrentSongIndex(prev => prev + 1);
-    } else {
-      setIsPlaying(false);
-      setCurrentSongIndex(0);
-    }
-  };
+    };
+  }, [isPlaying]);
 
   const handlePlayPause = async () => {
     if (!isExpanded) {
       setIsExpanded(true);
     }
 
-    if (!audioRef.current) return;
+    if (!playerRef.current) return;
 
     if (isPlaying) {
-      audioRef.current.pause();
+      await playerRef.current.pause();
     } else {
-      try {
-        await audioRef.current.play();
-      } catch (error) {
-        console.error('Failed to play audio:', error);
-      }
+      await playerRef.current.resume();
     }
     setIsPlaying(!isPlaying);
   };
 
-  const handleProgressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProgressChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newProgress = Number(e.target.value);
     setProgress(newProgress);
-    if (audioRef.current) {
-      const newTime = (newProgress / 100) * audioRef.current.duration;
-      audioRef.current.currentTime = newTime;
+    if (playerRef.current) {
+      const newTime = (newProgress / 100) * duration;
+      await playerRef.current.seek(newTime);
       setCurrentTime(newTime);
     }
   };
 
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVolumeChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = Number(e.target.value);
     setVolume(newVolume);
-    if (audioRef.current) {
-      audioRef.current.volume = newVolume / 100;
+    if (playerRef.current) {
+      await playerRef.current.setVolume(newVolume / 100);
     }
   };
 
   const handleCollapse = () => {
     setIsExpanded(false);
-    if (audioRef.current) {
-      audioRef.current.pause();
-      setIsPlaying(false);
+  };
+
+  const handleSkipBack = async () => {
+    if (playerRef.current) {
+      await playerRef.current.previousTrack();
     }
   };
 
-  const handleSkipBack = () => {
-    if (currentSongIndex > 0) {
-      setCurrentSongIndex(prev => prev - 1);
+  const handleSkipForward = async () => {
+    if (playerRef.current) {
+      await playerRef.current.nextTrack();
     }
   };
 
-  const handleSkipForward = () => {
-    if (currentSongIndex < playlist.length - 1) {
-      setCurrentSongIndex(prev => prev + 1);
-    }
+  const handleLogin = () => {
+    window.location.href = '/api/spotify/auth';
   };
 
-  const formatTime = (timeInSeconds: number) => {
-    const minutes = Math.floor(timeInSeconds / 60);
-    const seconds = Math.floor(timeInSeconds % 60);
+  const formatTime = (timeInMs: number) => {
+    const totalSeconds = Math.floor(timeInMs / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
-  const currentSong = playlist[currentSongIndex];
+  if (isLoading) {
+    return (
+      <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50">
+        <div className="glass-card rounded-full p-6 bg-primary/20">
+          <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50">
+        <button 
+          onClick={handleLogin}
+          className="glass-card glass-hover rounded-full px-6 py-3 transition-all duration-500 hover:scale-110 bg-primary/20"
+        >
+          <span className="text-sm font-medium text-primary">Connect Spotify</span>
+        </button>
+      </div>
+    );
+  }
 
   if (!isExpanded) {
     return (
@@ -154,7 +313,11 @@ const MusicPlayer: React.FC = () => {
           onClick={handlePlayPause}
           className="glass-card glass-hover rounded-full p-6 transition-all duration-500 hover:scale-110 bg-primary/20"
         >
-          <Play className="w-4 h-4 text-primary" />
+          {isPlaying ? (
+            <Pause className="w-4 h-4 text-primary" />
+          ) : (
+            <Play className="w-4 h-4 text-primary" />
+          )}
         </button>
       </div>
     );
@@ -176,10 +339,10 @@ const MusicPlayer: React.FC = () => {
         {/* Song Info */}
         <div className="text-center mb-3">
           <h3 className="text-sm font-semibold text-foreground truncate">
-            {currentSong?.title || 'No song selected'}
+            {currentTrack?.name || 'No track playing'}
           </h3>
           <p className="text-xs text-muted-foreground truncate">
-            {currentSong?.artist || 'Unknown artist'}
+            {currentTrack?.artists.map(artist => artist.name).join(', ') || 'Unknown artist'}
           </p>
         </div>
 
@@ -208,8 +371,7 @@ const MusicPlayer: React.FC = () => {
         <div className="flex items-center justify-center space-x-4 mb-3">
           <button 
             onClick={handleSkipBack}
-            disabled={currentSongIndex === 0}
-            className="glass-card glass-hover rounded-xl p-2 transition-all disabled:opacity-50"
+            className="glass-card glass-hover rounded-xl p-2 transition-all"
           >
             <SkipBack className="w-4 h-4 text-foreground" />
           </button>
@@ -227,8 +389,7 @@ const MusicPlayer: React.FC = () => {
           
           <button 
             onClick={handleSkipForward}
-            disabled={currentSongIndex === playlist.length - 1}
-            className="glass-card glass-hover rounded-xl p-2 transition-all disabled:opacity-50"
+            className="glass-card glass-hover rounded-xl p-2 transition-all"
           >
             <SkipForward className="w-4 h-4 text-foreground" />
           </button>
