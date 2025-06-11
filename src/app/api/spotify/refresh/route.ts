@@ -36,6 +36,8 @@ export async function POST() {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax' as const,
+      path: '/',
+      domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
     };
 
     const responseObj = NextResponse.json({ success: true });
@@ -44,6 +46,16 @@ export async function POST() {
     responseObj.cookies.set('spotify_access_token', data.access_token, {
       ...cookieOptions,
       maxAge: data.expires_in,
+    });
+
+    // Add a non-httpOnly cookie for the Web Playback SDK
+    responseObj.cookies.set('spotify_web_token', data.access_token, {
+      httpOnly: false,  // Allow JavaScript access
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax' as const,
+      path: '/',
+      maxAge: data.expires_in,
+      domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
     });
 
     // If a new refresh token was provided, update it

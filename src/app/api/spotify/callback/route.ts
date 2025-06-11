@@ -89,10 +89,11 @@ export async function GET(request: Request) {
 
     // Store tokens in cookies
     const cookieOptions = {
-      httpOnly: false,
+      httpOnly: true,  // Set to true for security
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax' as const,
       path: '/',
+      domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
     };
 
     const responseObj = NextResponse.redirect(new URL('/', request.url));
@@ -107,6 +108,16 @@ export async function GET(request: Request) {
     responseObj.cookies.set('spotify_refresh_token', data.refresh_token, {
       ...cookieOptions,
       maxAge: 365 * 24 * 60 * 60,
+    });
+
+    // Add a non-httpOnly cookie for the Web Playback SDK
+    responseObj.cookies.set('spotify_web_token', data.access_token, {
+      httpOnly: false,  // Allow JavaScript access
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax' as const,
+      path: '/',
+      maxAge: data.expires_in,
+      domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
     });
 
     // Clear the state cookie

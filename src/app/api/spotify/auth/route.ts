@@ -57,7 +57,8 @@ export async function GET(request: Request) {
     'streaming',
     'playlist-read-private',
     'playlist-read-collaborative',
-    'user-library-read'
+    'user-library-read',
+    'app-remote-control'
   ].join(' ');
 
   const params = new URLSearchParams({

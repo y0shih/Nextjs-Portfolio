@@ -113,10 +113,9 @@ const MusicPlayer: React.FC = () => {
   // Initialize Spotify Web Playback SDK
   useEffect(() => {
     const initializePlayer = async () => {
-      // Remove token logging
       const token = document.cookie
         .split('; ')
-        .find(row => row.startsWith('spotify_access_token='))
+        .find(row => row.startsWith('spotify_web_token='))
         ?.split('=')[1];
 
       if (!token) {
@@ -327,7 +326,7 @@ const MusicPlayer: React.FC = () => {
     try {
       const token = document.cookie
         .split('; ')
-        .find(row => row.startsWith('spotify_access_token='))
+        .find(row => row.startsWith('spotify_web_token='))
         ?.split('=')[1];
 
       if (!token) {
