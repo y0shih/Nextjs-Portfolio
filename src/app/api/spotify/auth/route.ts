@@ -6,12 +6,25 @@ const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const REDIRECT_URI = process.env.NEXT_PUBLIC_BASE_URL + '/api/spotify/callback';
 
 // Add CORS headers to response
-const addCorsHeaders = (response: NextResponse) => {
-  const origin = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-  response.headers.set('Access-Control-Allow-Origin', origin);
-  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  response.headers.set('Access-Control-Allow-Credentials', 'true');
+const addCorsHeaders = (response: NextResponse, request: Request) => {
+  // Get the origin from the request headers
+  const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  
+  // List of allowed origins
+  const allowedOrigins = [
+    'http://localhost:3000',
+    'https://nextjs-portfolio-u735.vercel.app',
+    process.env.NEXT_PUBLIC_BASE_URL
+  ].filter(Boolean); // Remove any undefined values
+
+  // Check if the origin is allowed
+  if (allowedOrigins.includes(origin)) {
+    response.headers.set('Access-Control-Allow-Origin', origin);
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    response.headers.set('Access-Control-Allow-Credentials', 'true');
+  }
+
   return response;
 };
 
@@ -26,9 +39,9 @@ const generateRandomString = (length: number) => {
 };
 
 // GET /api/spotify/auth - Start the OAuth flow
-export async function GET() {
+export async function GET(request: Request) {
   if (!SPOTIFY_CLIENT_ID) {
-    return addCorsHeaders(new NextResponse('Spotify client ID not configured', { status: 500 }));
+    return addCorsHeaders(new NextResponse('Spotify client ID not configured', { status: 500 }), request);
   }
 
   const state = generateRandomString(16);
@@ -79,10 +92,10 @@ export async function GET() {
   const setCookieHeader = response.headers.get('set-cookie');
   console.log('[Auth Route] Set-Cookie header:', setCookieHeader);
 
-  return addCorsHeaders(response);
+  return addCorsHeaders(response, request);
 }
 
 // Handle OPTIONS request for CORS preflight
-export async function OPTIONS() {
-  return addCorsHeaders(new NextResponse(null, { status: 204 }));
+export async function OPTIONS(request: Request) {
+  return addCorsHeaders(new NextResponse(null, { status: 204 }), request);
 } 

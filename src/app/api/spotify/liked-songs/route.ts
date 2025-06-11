@@ -2,12 +2,25 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
 // Add CORS headers to response
-const addCorsHeaders = (response: NextResponse) => {
-  const origin = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-  response.headers.set('Access-Control-Allow-Origin', origin);
-  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  response.headers.set('Access-Control-Allow-Credentials', 'true');
+const addCorsHeaders = (response: NextResponse, request: Request) => {
+  // Get the origin from the request headers
+  const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  
+  // List of allowed origins
+  const allowedOrigins = [
+    'http://localhost:3000',
+    'https://nextjs-portfolio-u735.vercel.app',
+    process.env.NEXT_PUBLIC_BASE_URL
+  ].filter(Boolean); // Remove any undefined values
+
+  // Check if the origin is allowed
+  if (allowedOrigins.includes(origin)) {
+    response.headers.set('Access-Control-Allow-Origin', origin);
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    response.headers.set('Access-Control-Allow-Credentials', 'true');
+  }
+
   return response;
 };
 
@@ -25,12 +38,12 @@ interface SpotifyTrack {
   };
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   const cookieStore = cookies();
   const accessToken = cookieStore.get('spotify_access_token')?.value;
 
   if (!accessToken) {
-    return addCorsHeaders(new NextResponse('No access token', { status: 401 }));
+    return addCorsHeaders(new NextResponse('No access token', { status: 401 }), request);
   }
 
   try {
@@ -57,14 +70,14 @@ export async function GET() {
       coverUrl: item.track.album.images[0]?.url
     }));
 
-    return addCorsHeaders(NextResponse.json({ songs }));
+    return addCorsHeaders(NextResponse.json({ songs }), request);
   } catch (error) {
     console.error('Error fetching liked songs:', error);
-    return addCorsHeaders(new NextResponse('Failed to fetch liked songs', { status: 500 }));
+    return addCorsHeaders(new NextResponse('Failed to fetch liked songs', { status: 500 }), request);
   }
 }
 
 // Handle OPTIONS request for CORS preflight
-export async function OPTIONS() {
-  return addCorsHeaders(new NextResponse(null, { status: 204 }));
+export async function OPTIONS(request: Request) {
+  return addCorsHeaders(new NextResponse(null, { status: 204 }), request);
 } 
