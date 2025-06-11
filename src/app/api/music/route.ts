@@ -33,30 +33,4 @@ const PLAYLIST: Song[] = [
 // GET /api/music - Get the playlist
 export async function GET() {
   return NextResponse.json({ playlist: PLAYLIST });
-}
-
-// GET /api/music/stream/[id] - Stream a specific song
-export async function GET_STREAM(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  const id = params.id;
-  const song = PLAYLIST.find(s => s.id === id);
-  
-  if (!song) {
-    return new NextResponse('Song not found', { status: 404 });
-  }
-
-  // In a real application, you would:
-  // 1. Get the actual audio file from your storage (e.g., S3, local filesystem)
-  // 2. Stream it properly with proper headers for audio streaming
-  // 3. Handle range requests for seeking
-  
-  // For now, we'll return a mock response
-  return new NextResponse('Mock audio data', {
-    headers: {
-      'Content-Type': 'audio/mpeg',
-      'Content-Length': '1000000', // Mock size
-    },
-  });
 } 

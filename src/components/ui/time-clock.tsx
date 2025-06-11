@@ -8,15 +8,22 @@ interface TimeClockProps {
 }
 
 export function TimeClock({ className }: TimeClockProps) {
+  const [mounted, setMounted] = React.useState(false);
   const [time, setTime] = React.useState(new Date());
 
   React.useEffect(() => {
+    setMounted(true);
     const timer = setInterval(() => {
       setTime(new Date());
     }, 1000);
 
     return () => clearInterval(timer);
   }, []);
+
+  // Don't render anything until mounted to prevent hydration mismatch
+  if (!mounted) {
+    return null;
+  }
 
   const hours = time.getHours().toString().padStart(2, "0");
   const minutes = time.getMinutes().toString().padStart(2, "0");

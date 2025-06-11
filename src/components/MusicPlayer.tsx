@@ -104,7 +104,7 @@ const MusicPlayer: React.FC = () => {
 
   const playerRef = useRef<SpotifyPlayer | null>(null);
   const deviceIdRef = useRef<string | null>(null);
-  const progressIntervalRef = useRef<NodeJS.Timeout>();
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize Spotify Web Playback SDK
   useEffect(() => {
