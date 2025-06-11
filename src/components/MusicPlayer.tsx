@@ -188,6 +188,7 @@ const MusicPlayer: React.FC = () => {
       };
     };
 
+    // Set up the callback for when the SDK is ready
     window.onSpotifyWebPlaybackSDKReady = initializePlayer;
 
     // Load the Spotify Web Playback SDK script
@@ -198,15 +199,17 @@ const MusicPlayer: React.FC = () => {
 
     return () => {
       document.body.removeChild(script);
+      // Clean up the callback
+      window.onSpotifyWebPlaybackSDKReady = () => {};
     };
-  }, []);
+  }, [volume]);
 
   // Update progress every second
   useEffect(() => {
     if (isPlaying) {
       progressIntervalRef.current = setInterval(() => {
         if (playerRef.current) {
-          playerRef.current.getCurrentState().then((state: any) => {
+          playerRef.current.getCurrentState().then((state: SpotifyPlaybackState | null) => {
             if (state) {
               setCurrentTime(state.position);
               setProgress((state.position / state.duration) * 100);
