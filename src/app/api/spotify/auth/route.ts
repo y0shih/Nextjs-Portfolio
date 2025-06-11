@@ -7,9 +7,11 @@ const REDIRECT_URI = process.env.NEXT_PUBLIC_BASE_URL + '/api/spotify/callback';
 
 // Add CORS headers to response
 const addCorsHeaders = (response: NextResponse) => {
-  response.headers.set('Access-Control-Allow-Origin', '*');
+  const origin = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  response.headers.set('Access-Control-Allow-Origin', origin);
   response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  response.headers.set('Access-Control-Allow-Credentials', 'true');
   return response;
 };
 
