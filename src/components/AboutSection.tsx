@@ -51,17 +51,17 @@ const AboutSection: React.FC = () => {
     }
   };
 
-  const statsVariants = {
-    hidden: { opacity: 0, scale: 0.8 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut"
-      }
-    }
-  };
+  // const statsVariants = {
+  //   hidden: { opacity: 0, scale: 0.8 },
+  //   visible: {
+  //     opacity: 1,
+  //     scale: 1,
+  //     transition: {
+  //       duration: 0.5,
+  //       ease: "easeOut"
+  //     }
+  //   }
+  // };
 
   return (
     <section className="py-24 px-6">
@@ -117,7 +117,7 @@ const AboutSection: React.FC = () => {
         </motion.div>
 
         {/* Experience Stats */}
-        <motion.div 
+        {/* <motion.div 
           className="mt-16 glass-card rounded-2xl p-8"
           variants={statsVariants}
           whileHover={{ 
@@ -126,7 +126,7 @@ const AboutSection: React.FC = () => {
           }}
           transition={{ duration: 0.3 }}
         >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             {[
               { value: "2+", label: "Years Experience" },
               { value: "30+", label: "Projects Completed" },
@@ -150,8 +150,8 @@ const AboutSection: React.FC = () => {
                 <div className="text-muted-foreground">{stat.label}</div>
               </motion.div>
             ))}
-          </div>
-        </motion.div>
+          </div> */}
+        {/* </motion.div> */} 
       </motion.div>
     </section>
   )

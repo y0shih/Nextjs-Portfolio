@@ -11,16 +11,27 @@ export default function AnimatedTitle() {
 
   useEffect(() => {
     let currentIndex = 0
+    let isReversing = false
 
     const interval = setInterval(() => {
-      if (currentIndex >= words.length) {
-        clearInterval(interval)
-        return
-      }
-      
+      // Update title based on current direction
       const newTitle = words.slice(0, currentIndex + 1).join(' ') + ' | ' + baseTitle
       document.title = newTitle
-      currentIndex++
+
+      // Update index based on direction
+      if (isReversing) {
+        currentIndex--
+        if (currentIndex < 0) {
+          currentIndex = 0
+          isReversing = false
+        }
+      } else {
+        currentIndex++
+        if (currentIndex >= words.length) {
+          currentIndex = words.length - 1
+          isReversing = true
+        }
+      }
     }, 900) // Change word every 900ms
 
     // Cleanup

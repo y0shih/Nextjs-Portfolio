@@ -247,7 +247,7 @@ const MusicPlayer: React.FC = () => {
               <div className="mt-2">
                 <div className="relative h-1 bg-muted/50 overflow-hidden">
                   <div 
-                    className="absolute top-0 left-0 h-full bg-primary transition-all duration-100"
+                    className={`absolute top-0 left-0 h-full bg-primary transition-all duration-100 ${isPlaying ? 'progress-bar-beat' : ''}`}
                     style={{ width: `${progress}%` }}
                   />
                   <input

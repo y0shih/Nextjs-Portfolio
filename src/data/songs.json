@@ -6,7 +6,7 @@
       "artist": "mck",
       "duration": 106,
       "url": "/music/mck.mp3",
-      "coverUrl": "/covers/sample1.jpg"
+      "coverUrl": "/covers/mck.jpg"
     },
     {
       "id": "2",
@@ -14,7 +14,7 @@
       "artist": "suicideboys",
       "duration": 133,
       "url": "/music/$b.mp3",
-      "coverUrl": "/covers/sample2.jpg"
+      "coverUrl": "/covers/$b.jpg"
     }
   ]
 } 

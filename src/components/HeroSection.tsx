@@ -146,7 +146,7 @@ const HeroSection: React.FC = () => {
           variants={fadeInUpVariants}
         >
           Crafting reliable and scalable digital systems with a focus on performance, 
-          security, and clean architecture. Driven by curiosity and a passion for solving real-world problems through thoughtful engineering.
+          security, and clean architecture.
         </motion.p>
 
         {/* Social Links */}
