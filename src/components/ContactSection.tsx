@@ -1,8 +1,15 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Mail, Phone, MapPin, Send } from 'lucide-react'
 import emailjs from '@emailjs/browser'
+
+// Rate limiting configuration
+const RATE_LIMIT = {
+  maxEmails: 2,
+  timeWindow: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+  storageKey: 'email_send_timestamps'
+} as const;
 
 // Validate environment variables
 const requiredEnvVars = {
@@ -29,6 +36,66 @@ const ContactSection: React.FC = () => {
     type: 'idle',
     message: ''
   });
+  const [emailCount, setEmailCount] = useState<number>(0);
+  const [timeUntilReset, setTimeUntilReset] = useState<number>(0);
+
+  // Initialize rate limiting on component mount
+  useEffect(() => {
+    const checkRateLimit = () => {
+      try {
+        const storedData = localStorage.getItem(RATE_LIMIT.storageKey);
+        if (storedData) {
+          const timestamps: number[] = JSON.parse(storedData);
+          const now = Date.now();
+          
+          // Filter out timestamps older than the time window
+          const recentTimestamps = timestamps.filter(
+            timestamp => now - timestamp < RATE_LIMIT.timeWindow
+          );
+          
+          // Update localStorage with only recent timestamps
+          if (recentTimestamps.length !== timestamps.length) {
+            localStorage.setItem(RATE_LIMIT.storageKey, JSON.stringify(recentTimestamps));
+          }
+          
+          setEmailCount(recentTimestamps.length);
+          
+          // Calculate time until reset
+          if (recentTimestamps.length > 0) {
+            const oldestTimestamp = Math.min(...recentTimestamps);
+            const resetTime = oldestTimestamp + RATE_LIMIT.timeWindow;
+            setTimeUntilReset(Math.max(0, resetTime - now));
+          } else {
+            setTimeUntilReset(0);
+          }
+        }
+      } catch (error) {
+        console.error('Error checking rate limit:', error);
+      }
+    };
+
+    checkRateLimit();
+    const interval = setInterval(checkRateLimit, 60000); // Check every minute
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Update time until reset display
+  useEffect(() => {
+    if (timeUntilReset > 0) {
+      const interval = setInterval(() => {
+        setTimeUntilReset(prev => Math.max(0, prev - 1000));
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [timeUntilReset]);
+
+  const formatTimeUntilReset = (ms: number): string => {
+    if (ms === 0) return '';
+    const hours = Math.floor(ms / (60 * 60 * 1000));
+    const minutes = Math.floor((ms % (60 * 60 * 1000)) / (60 * 1000));
+    return `${hours}h ${minutes}m`;
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -40,6 +107,15 @@ const ContactSection: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // Check rate limit
+    if (emailCount >= RATE_LIMIT.maxEmails) {
+      setStatus({
+        type: 'error',
+        message: `Rate limit exceeded. Please try again in ${formatTimeUntilReset(timeUntilReset)}.`
+      });
+      return;
+    }
 
     // Check if all required environment variables are present
     if (!hasRequiredEnvVars(requiredEnvVars)) {
@@ -66,6 +142,17 @@ const ContactSection: React.FC = () => {
         requiredEnvVars.publicKey
       );
 
+      // Update rate limiting after successful send
+      const now = Date.now();
+      const storedData = localStorage.getItem(RATE_LIMIT.storageKey);
+      const timestamps: number[] = storedData ? JSON.parse(storedData) : [];
+      const recentTimestamps = timestamps.filter(
+        timestamp => now - timestamp < RATE_LIMIT.timeWindow
+      );
+      recentTimestamps.push(now);
+      localStorage.setItem(RATE_LIMIT.storageKey, JSON.stringify(recentTimestamps));
+      setEmailCount(recentTimestamps.length);
+
       setStatus({
         type: 'success',
         message: 'Message sent successfully! I will get back to you soon.'
@@ -79,6 +166,8 @@ const ContactSection: React.FC = () => {
     }
   };
 
+  const isRateLimited = emailCount >= RATE_LIMIT.maxEmails;
+
   return (
     <section className="py-24 px-6 bg-black/50 backdrop-blur-sm relative">
       <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/30 -z-10" />
@@ -89,6 +178,12 @@ const ContactSection: React.FC = () => {
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Let&apos;s work together to bring your ideas to life. I&apos;m always excited to discuss new opportunities and projects.
           </p>
+          {emailCount > 0 && (
+            <p className="text-sm text-muted-foreground mt-2">
+              {emailCount} of {RATE_LIMIT.maxEmails} messages sent in the last 24 hours
+              {timeUntilReset > 0 && ` (Reset in ${formatTimeUntilReset(timeUntilReset)})`}
+            </p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -136,10 +231,10 @@ const ContactSection: React.FC = () => {
                   type="text" 
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full glass-card rounded-lg px-4 py-3 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 hover:scale-[1.02] focus:scale-[1.02] focus:text-blue-400 focus:glow-text" 
+                  className="w-full glass-card rounded-lg px-4 py-3 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 hover:scale-[1.02] focus:scale-[1.02] focus:text-blue-400 focus:glow-text disabled:opacity-50 disabled:cursor-not-allowed" 
                   placeholder="Your name"
                   required
-                  disabled={status.type === 'loading'}
+                  disabled={status.type === 'loading' || isRateLimited}
                 />
               </div>
               
@@ -151,10 +246,10 @@ const ContactSection: React.FC = () => {
                   type="email" 
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full glass-card rounded-lg px-4 py-3 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 hover:scale-[1.02] focus:scale-[1.02] focus:text-blue-400 focus:glow-text" 
+                  className="w-full glass-card rounded-lg px-4 py-3 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 hover:scale-[1.02] focus:scale-[1.02] focus:text-blue-400 focus:glow-text disabled:opacity-50 disabled:cursor-not-allowed" 
                   placeholder="your.email@example.com"
                   required
-                  disabled={status.type === 'loading'}
+                  disabled={status.type === 'loading' || isRateLimited}
                 />
               </div>
               
@@ -166,10 +261,10 @@ const ContactSection: React.FC = () => {
                   rows={4}
                   value={formData.message}
                   onChange={handleChange}
-                  className="w-full glass-card rounded-lg px-4 py-3 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none transition-all duration-300 hover:scale-[1.02] focus:scale-[1.02] focus:text-blue-400 focus:glow-text" 
+                  className="w-full glass-card rounded-lg px-4 py-3 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none transition-all duration-300 hover:scale-[1.02] focus:scale-[1.02] focus:text-blue-400 focus:glow-text disabled:opacity-50 disabled:cursor-not-allowed" 
                   placeholder="Tell me about your project..."
                   required
-                  disabled={status.type === 'loading'}
+                  disabled={status.type === 'loading' || isRateLimited}
                 ></textarea>
               </div>
 
@@ -186,12 +281,16 @@ const ContactSection: React.FC = () => {
               <button 
                 type="submit" 
                 className="w-full glass-card glass-hover rounded-lg px-6 py-3 text-foreground font-semibold flex items-center justify-center space-x-2 transition-all duration-300 hover:scale-105 hover:text-blue-400 hover:glow-text disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={status.type === 'loading'}
+                disabled={status.type === 'loading' || isRateLimited}
               >
                 {status.type === 'loading' ? (
                   <>
                     <div className="w-5 h-5 border-2 border-foreground border-t-transparent rounded-full animate-spin" />
                     <span>Sending...</span>
+                  </>
+                ) : isRateLimited ? (
+                  <>
+                    <span>Rate Limit Exceeded</span>
                   </>
                 ) : (
                   <>
