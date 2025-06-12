@@ -1,9 +1,10 @@
 import { Providers } from "@/components/providers"
 import "./globals.css"
+import AnimatedTitle from "@/components/AnimatedTitle"
 
 export const metadata = {
-  title: 'Welcome to my portfolio',
-  description: 'welcome to my portfolio : ) ',
+  title: 'Hello',
+  description: 'Welcome to my portfolio : ) ',
 }
 
 export default function RootLayout({
@@ -14,6 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
+        <AnimatedTitle />
         <Providers>
           {children}
         </Providers>

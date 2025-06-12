@@ -1,6 +1,8 @@
+"use client"
 import React from 'react'
 import { Code, Database, Rocket, Users } from 'lucide-react'
 import PortfolioCard from './PortfolioCard'
+import { motion } from 'framer-motion'
 
 const AboutSection: React.FC = () => {
   const skills = [
@@ -26,48 +28,131 @@ const AboutSection: React.FC = () => {
     }
   ]
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+        delayChildren: 0.3
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut"
+      }
+    }
+  };
+
+  const statsVariants = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut"
+      }
+    }
+  };
+
   return (
     <section className="py-24 px-6">
-      <div className="max-w-6xl mx-auto">
+      <motion.div 
+        className="max-w-6xl mx-auto"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={containerVariants}
+      >
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 glow-text">About Me</h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+        <motion.div 
+          className="text-center mb-16"
+          variants={itemVariants}
+        >
+          <motion.h2 
+            className="text-4xl md:text-5xl font-bold mb-6 glow-text"
+            whileHover={{ scale: 1.02 }}
+            transition={{ duration: 0.2 }}
+          >
+            About Me
+          </motion.h2>
+          <motion.p 
+            className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed"
+            variants={itemVariants}
+          >
             I&apos;m a backend-focused developer with a background in data analysis. I specialize in building efficient APIs, managing databases, and deploying scalable systems using Node.js, TypeScript, Python and PostgreSQL. Passionate about clean code and continuous learning.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
         {/* Skills Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          variants={containerVariants}
+        >
           {skills.map((skill, index) => (
-            <PortfolioCard
+            <motion.div
               key={skill.title}
-              icon={skill.icon}
-              title={skill.title}
-              description={skill.description}
-              delay={index * 150}
-            />
+              variants={itemVariants}
+              whileHover={{ 
+                scale: 1.02,
+                transition: { duration: 0.2 }
+              }}
+            >
+              <PortfolioCard
+                icon={skill.icon}
+                title={skill.title}
+                description={skill.description}
+                delay={index * 150}
+              />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Experience Stats */}
-        <div className="mt-16 glass-card rounded-2xl p-8">
+        <motion.div 
+          className="mt-16 glass-card rounded-2xl p-8"
+          variants={statsVariants}
+          whileHover={{ 
+            scale: 1.02,
+            boxShadow: "0 0 30px rgba(255,255,255,0.1)"
+          }}
+          transition={{ duration: 0.3 }}
+        >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div className="fade-in-up" style={{ animationDelay: '600ms' }}>
-              <div className="text-4xl font-bold text-primary mb-2">2+</div>
-              <div className="text-muted-foreground">Years Experience</div>
-            </div>
-            <div className="fade-in-up" style={{ animationDelay: '700ms' }}>
-              <div className="text-4xl font-bold text-primary mb-2">30+</div>
-              <div className="text-muted-foreground">Projects Completed</div>
-            </div>
-            <div className="fade-in-up" style={{ animationDelay: '800ms' }}>
-              <div className="text-4xl font-bold text-primary mb-2">20+</div>
-              <div className="text-muted-foreground">Happy Clients</div>
-            </div>
+            {[
+              { value: "2+", label: "Years Experience" },
+              { value: "30+", label: "Projects Completed" },
+              { value: "20+", label: "Happy Clients" }
+            ].map((stat, index) => (
+              <motion.div
+                key={stat.label}
+                variants={itemVariants}
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+              >
+                <motion.div 
+                  className="text-4xl font-bold text-primary mb-2"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.2 }}
+                >
+                  {stat.value}
+                </motion.div>
+                <div className="text-muted-foreground">{stat.label}</div>
+              </motion.div>
+            ))}
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </section>
   )
 }

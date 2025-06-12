@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -75,7 +74,7 @@
   }
 
   .floating-animation {
-    animation: float 6s ease-in-out infinite;
+    animation: floating 6s ease-in-out infinite;
   }
 
   .floating-delayed {
@@ -87,12 +86,15 @@
   }
 }
 
-@keyframes float {
-  0%, 100% {
+@keyframes floating {
+  0% {
     transform: translateY(0px);
   }
   50% {
     transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
   }
 }
 

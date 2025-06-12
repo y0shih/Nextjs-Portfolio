@@ -1,0 +1,20 @@
+{
+  "songs": [
+    {
+      "id": "1",
+      "title": "thap drill",
+      "artist": "mck",
+      "duration": 106,
+      "url": "/music/mck.mp3",
+      "coverUrl": "/covers/sample1.jpg"
+    },
+    {
+      "id": "2",
+      "title": "alien are ghosts",
+      "artist": "suicideboys",
+      "duration": 133,
+      "url": "/music/$b.mp3",
+      "coverUrl": "/covers/sample2.jpg"
+    }
+  ]
+} 
