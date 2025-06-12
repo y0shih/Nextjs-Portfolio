@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 import Image from 'next/image'
 import { Github, Linkedin, Mail, Download } from 'lucide-react'
@@ -64,20 +66,39 @@ const HeroSection: React.FC = () => {
 
         {/* Social Links */}
         <div className="flex justify-center space-x-4 mb-8 fade-in-up" style={{ animationDelay: '600ms' }}>
-          <a href="#" className="glass-card glass-hover rounded-xl p-3">
+          <a 
+            href="https://github.com/y0shih" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="glass-card glass-hover rounded-xl p-3"
+            aria-label="GitHub Profile"
+          >
             <Github className="w-6 h-6 text-foreground" />
           </a>
-          <a href="#" className="glass-card glass-hover rounded-xl p-3">
+          <a 
+            href="https://linkedin.com/in/" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="glass-card glass-hover rounded-xl p-3"
+            aria-label="LinkedIn Profile"
+          >
             <Linkedin className="w-6 h-6 text-foreground" />
           </a>
-          <a href="#" className="glass-card glass-hover rounded-xl p-3">
+          <a 
+            href="mailto:trongh1337@gmail.com" 
+            className="glass-card glass-hover rounded-xl p-3"
+            aria-label="Email"
+          >
             <Mail className="w-6 h-6 text-foreground" />
           </a>
         </div>
 
         {/* CTA Button */}
         <div className="fade-in-up" style={{ animationDelay: '800ms' }}>
-          <button className="glass-card glass-hover rounded-xl px-8 py-4 text-foreground font-semibold flex items-center mx-auto space-x-2">
+          <button 
+            onClick={() => window.open('/CV-Intern.pdf', '_blank')}
+            className="glass-card glass-hover rounded-xl px-8 py-4 text-foreground font-semibold flex items-center mx-auto space-x-2"
+          >
             <Download className="w-5 h-5" />
             <span>Download Resume</span>
           </button>

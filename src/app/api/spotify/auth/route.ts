@@ -45,8 +45,6 @@ export async function GET(request: Request) {
   }
 
   const state = generateRandomString(16);
-  console.log('[Auth Route] Generated state:', state);
-  console.log('[Auth Route] NEXT_PUBLIC_BASE_URL:', process.env.NEXT_PUBLIC_BASE_URL);
   
   const scope = [
     'user-read-private',
@@ -71,13 +69,6 @@ export async function GET(request: Request) {
 
   // Store state in a cookie for verification
   const response = NextResponse.redirect(`https://accounts.spotify.com/authorize?${params.toString()}`);
-  console.log('[Auth Route] Setting cookie with state:', state);
-  console.log('[Auth Route] Cookie settings:', {
-    domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined,
-    path: '/',
-    secure: true,
-    sameSite: 'lax'
-  });
   
   response.cookies.set('spotify_auth_state', state, {
     httpOnly: true,
@@ -86,13 +77,12 @@ export async function GET(request: Request) {
     path: '/',
     maxAge: 60 * 60, // 1 hour
     // Remove domain restriction to test if that's the issue
-    // domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
+    domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
   });
 
   // Log the actual cookie that was set
   const setCookieHeader = response.headers.get('set-cookie');
   console.log('[Auth Route] Set-Cookie header:', setCookieHeader);
-
   return addCorsHeaders(response, request);
 }
 
