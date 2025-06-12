@@ -1,12 +1,52 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Github, Linkedin, Mail, Download } from 'lucide-react'
 import profileImage from '../assets/images/profile.png'
 import { motion } from 'framer-motion'
+import GradientText from "./ui/GradientText"
 
 const HeroSection: React.FC = () => {
+  const roles = [
+    { text: "Web Developer" },
+    { text: "Data Analyst" },
+    { text: "Software Engineer" },
+    { text: "Software Developer" }
+  ];
+
+  const [roleIndex, setRoleIndex] = useState(0);
+  const [currentText, setCurrentText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const typingSpeed = 150; // milliseconds per character
+  const deletingSpeed = 100; // milliseconds per character
+  const delayBetweenRoles = 1500; // milliseconds
+
+  useEffect(() => {
+    const handleTyping = () => {
+      const fullText = roles[roleIndex].text;
+      setCurrentText(prevText => 
+        isDeleting 
+          ? fullText.substring(0, prevText.length - 1)
+          : fullText.substring(0, prevText.length + 1)
+      );
+
+      if (!isDeleting && currentText === fullText) {
+        setTimeout(() => setIsDeleting(true), delayBetweenRoles);
+      } else if (isDeleting && currentText === '') {
+        setIsDeleting(false);
+        setRoleIndex((prevIndex) => (prevIndex + 1) % roles.length);
+      }
+    };
+
+    const timer = setTimeout(
+      handleTyping,
+      isDeleting ? deletingSpeed : typingSpeed
+    );
+
+    return () => clearTimeout(timer);
+  }, [currentText, isDeleting, roleIndex, roles]);
+
   const floatingVariants = {
     initial: { y: 0 },
     animate: {
@@ -134,10 +174,12 @@ const HeroSection: React.FC = () => {
           Do Phu Trong
         </motion.h1>
         <motion.h2 
-          className="text-2xl md:text-3xl text-muted-foreground mb-6"
+          className="text-2xl md:text-3xl font-bold mb-6"
           variants={fadeInUpVariants}
         >
-          Full Stack Developer
+          <GradientText>
+            I am a {currentText}
+          </GradientText>
         </motion.h2>
         
         {/* Description */}
