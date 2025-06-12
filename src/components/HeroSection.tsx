@@ -47,17 +47,17 @@ const HeroSection: React.FC = () => {
     return () => clearTimeout(timer);
   }, [currentText, isDeleting, roleIndex, roles]);
 
-  const floatingVariants = {
-    initial: { y: 0 },
-    animate: {
-      y: [-10, 10, -10],
-      transition: {
-        duration: 6,
-        repeat: Infinity,
-        ease: "easeInOut"
-      }
-    }
-  };
+  // const floatingVariants = {
+  //   initial: { y: 0 },
+  //   animate: {
+  //     y: [-10, 10, -10],
+  //     transition: {
+  //       duration: 6,
+  //       repeat: Infinity,
+  //       ease: "easeInOut"
+  //     }
+  //   }
+  // };
 
   const fadeInUpVariants = {
     initial: { opacity: 0, y: 20 },
@@ -78,60 +78,36 @@ const HeroSection: React.FC = () => {
 
   return (
     <section className="min-h-screen flex items-center justify-center px-6 relative overflow-hidden">
+      {/* Video Background */}
+      <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute min-w-full min-h-full object-cover opacity-20"
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '100%',
+            height: '100%',
+          }}
+        >
+          <source src="/videos/clip.mp4" type="video/mp4" />
+        </video>
+        {/* Dark overlay to ensure content visibility */}
+        <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]" />
+      </div>
+
       {/* Background floating programming language logos */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* React Logo */}
-        <motion.div 
-          className="absolute top-20 left-10 w-24 h-24 glass-card rounded-xl opacity-30 flex items-center justify-center"
-          variants={floatingVariants}
-          initial="initial"
-          animate="animate"
-          style={{ animationDelay: '0s' }}
-        >
-          <motion.div 
-            className="text-2xl font-bold text-primary"
-            whileHover={{ scale: 1.2, rotate: 360 }}
-            transition={{ duration: 0.3 }}
-          >
-            ⚛️
-          </motion.div>
-        </motion.div>
-        
-        {/* TypeScript Logo */}
-        <motion.div 
-          className="absolute top-40 right-20 w-20 h-20 glass-card rounded-xl opacity-40 flex items-center justify-center"
-          variants={floatingVariants}
-          initial="initial"
-          animate="animate"
-          style={{ animationDelay: '1s' }}
-        >
-          <motion.div 
-            className="text-lg font-bold text-blue-400"
-            whileHover={{ scale: 1.2 }}
-            transition={{ duration: 0.3 }}
-          >
-            TS
-          </motion.div>
-        </motion.div>
-        
-        {/* JavaScript Logo */}
-        <div className="absolute bottom-32 left-1/4 w-28 h-28 glass-card rounded-xl floating-animation opacity-35 flex items-center justify-center">
-          <div className="text-xl font-bold text-yellow-400">JS</div>
-        </div>
-        
-        {/* Node.js Logo */}
-        <div className="absolute bottom-40 right-32 w-22 h-22 glass-card rounded-xl floating-delayed opacity-30 flex items-center justify-center">
-          <div className="text-sm font-bold text-green-400">1337</div>
-        </div>
-        
-        {/* Python Logo */}
-        <div className="absolute top-1/2 right-10 w-26 h-26 glass-card rounded-xl floating-animation opacity-25 flex items-center justify-center">
-          <div className="text-lg font-bold text-blue-300">PY</div>
-        </div>
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
+        {/* Add your floating programming language logos here */}
       </div>
 
       <motion.div 
-        className="max-w-4xl mx-auto text-center relative z-10"
+        className="max-w-4xl mx-auto text-center relative z-20"
         variants={staggerContainer}
         initial="initial"
         animate="animate"

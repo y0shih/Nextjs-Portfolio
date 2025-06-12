@@ -72,7 +72,8 @@ const TechnicalExpertiseSection: React.FC = () => {
   }
 
   return (
-    <section className="py-24 px-6">
+    <section className="py-24 px-6 bg-black/50 backdrop-blur-sm relative">
+      <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/30 -z-10" />
       <motion.div 
         className="max-w-6xl mx-auto overflow-hidden"
         initial="hidden"
@@ -108,7 +109,7 @@ const TechnicalExpertiseSection: React.FC = () => {
           {duplicatedLanguages.map((language) => (
             <motion.div
               key={language.name}
-              className="inline-flex items-center space-x-4 mx-8 p-4 glass-card rounded-lg flex-shrink-0"
+              className="inline-flex items-center space-x-4 mx-8 p-4 glass-card rounded-lg flex-shrink-0 bg-black/30 backdrop-blur-sm"
             >
               <img src={language.logoPath} alt={language.name} className="w-10 h-10" />
               <h4 className="text-xl font-semibold text-foreground">

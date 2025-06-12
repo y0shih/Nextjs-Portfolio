@@ -1,8 +1,9 @@
 "use client"
 import React from 'react'
 import { Code, Database, Rocket, Users } from 'lucide-react'
-import PortfolioCard from './PortfolioCard'
+
 import { motion } from 'framer-motion'
+import PortfolioCard from './PortfolioCard'
 
 const AboutSection: React.FC = () => {
   const skills = [
@@ -64,7 +65,8 @@ const AboutSection: React.FC = () => {
   // };
 
   return (
-    <section className="py-24 px-6">
+    <section className="py-24 px-6 bg-black/50 backdrop-blur-sm relative">
+      <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/30 -z-10" />
       <motion.div 
         className="max-w-6xl mx-auto"
         initial="hidden"
@@ -111,6 +113,7 @@ const AboutSection: React.FC = () => {
                 title={skill.title}
                 description={skill.description}
                 delay={index * 150}
+                className="bg-black/30 backdrop-blur-sm"
               />
             </motion.div>
           ))}
