@@ -1,6 +1,7 @@
 import { Providers } from "@/components/providers"
 import "./globals.css"
 import AnimatedTitle from "@/components/AnimatedTitle"
+import Footer from "@/components/Footer"
 
 export const metadata = {
   title: 'Hello',
@@ -18,6 +19,7 @@ export default function RootLayout({
         <AnimatedTitle />
         <Providers>
           {children}
+          <Footer />
         </Providers>
       </body>
     </html>

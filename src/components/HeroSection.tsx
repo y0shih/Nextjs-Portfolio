@@ -85,7 +85,7 @@ const HeroSection: React.FC = () => {
           muted
           loop
           playsInline
-          className="absolute min-w-full min-h-full object-cover opacity-20"
+          className="absolute min-w-full min-h-full object-cover"
           style={{
             position: 'absolute',
             top: '50%',
@@ -95,16 +95,12 @@ const HeroSection: React.FC = () => {
             height: '100%',
           }}
         >
-          <source src="/videos/clip.mp4" type="video/mp4" />
+          <source src="/videos/sss.mp4" type="video/mp4" />
         </video>
         {/* Dark overlay to ensure content visibility */}
-        <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]" />
       </div>
 
-      {/* Background floating programming language logos */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
-        {/* Add your floating programming language logos here */}
-      </div>
 
       <motion.div 
         className="max-w-4xl mx-auto text-center relative z-20"
@@ -163,8 +159,8 @@ const HeroSection: React.FC = () => {
           className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed"
           variants={fadeInUpVariants}
         >
-          Crafting reliable and scalable digital systems with a focus on performance, 
-          security, and clean architecture.
+          Engineering resilient and scalable digital ecosystems, driven by a performance-first mindset, robust security principles,
+           and a commitment to elegant, maintainable architecture.
         </motion.p>
 
         {/* Social Links */}
