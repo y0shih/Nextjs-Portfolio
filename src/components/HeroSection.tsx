@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { Github, Linkedin, Mail, Download } from 'lucide-react'
+import { Github, Linkedin, Mail } from 'lucide-react'
 import profileImage from '../assets/images/profile.png'
 import { motion } from 'framer-motion'
 import GradientText from "./ui/GradientText"
@@ -192,6 +192,7 @@ const HeroSection: React.FC = () => {
         </motion.div>
 
         {/* CTA Button */}
+        {/* Commented out download resume button
         <motion.div variants={fadeInUpVariants}>
           <motion.button 
             onClick={() => window.open('/CV-Intern.pdf', '_blank')}
@@ -207,6 +208,7 @@ const HeroSection: React.FC = () => {
             <span>Download Resume</span>
           </motion.button>
         </motion.div>
+        */}
       </motion.div>
     </section>
   )
