@@ -174,7 +174,7 @@ const HeroSection: React.FC = () => {
             
             {/* Description (from original HeroSection) */}
             <motion.p 
-              className="text-lg text-muted-foreground max-w-2xl mx-auto lg:mx-0 mb-8 leading-relaxed"
+              className="text-lg text-muted-foreground max-w-2xl mx-auto lg:mx-0 mb-8 leading-relaxed "
               variants={fadeInUpVariants}
             >
               Engineering resilient and scalable digital ecosystems, driven by a performance-first mindset, robust security principles,
