@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Github, ExternalLink, Code2, Database, Globe, ChevronDown } from "lucide-react";
+import { Github, ExternalLink, Code2, Database, TabletSmartphone, Globe, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { projects } from "@/data/projects";
 
@@ -14,7 +14,7 @@ interface Project {
   githubUrlBE?: string;
   liveUrl?: string;
   image?: string;
-  type: "web-app" | "software" | "fullstack";
+  type: "web-app" | "software" | "fullstack" | "mobile";
   slug: string;
 }
 
@@ -35,12 +35,14 @@ const ProjectsSection: React.FC = () => {
         return Database;
       case "fullstack":
         return Code2;
+      case "mobile":
+        return TabletSmartphone;
     }
   };
 
   return (
-    <section className="py-24 px-6 bg-black/50 backdrop-blur-sm relative">
-      <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/30 -z-10" />
+    <section className="py-24 px-6 bg-black backdrop-blur-sm relative">
+      <div className="absolute inset-0 from-black/50 -z-10" />
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">

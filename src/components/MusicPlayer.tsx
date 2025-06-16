@@ -36,16 +36,6 @@ const MusicPlayer: React.FC = () => {
         setPlaylist(data.playlist);
         if (data.playlist.length > 0) {
           setCurrentTrack(data.playlist[0]);
-          // Auto play the first track
-          setTimeout(() => {
-            if (audioRef.current) {
-              audioRef.current.play().then(() => {
-                setIsPlaying(true);
-              }).catch(error => {
-                console.error('Autoplay failed:', error);
-              });
-            }
-          }, 1000); // Small delay to ensure audio is loaded
         }
         setIsLoading(false);
       } catch (error) {
@@ -224,8 +214,8 @@ const MusicPlayer: React.FC = () => {
 
   if (!isExpanded && isPlaying) {
     return (
-      <div className="fixed top-8 left-1/2 transform -translate-x-1/2 z-50">
-        <div className="glass-card glass-hover px-6 py-3 transition-all duration-500 hover:scale-105 bg-primary/20 min-w-[300px] max-w-[400px] w-full">
+      <div className="fixed bottom-4 left-4 z-50">
+        <div className="glass-card glass-hover px-6 py-3 transition-all duration-500 hover:scale-105 bg-primary/10 min-w-[300px] max-w-[400px] w-full">
           <div className="flex items-center justify-between gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
@@ -275,10 +265,10 @@ const MusicPlayer: React.FC = () => {
 
   if (!isExpanded) {
     return (
-      <div className="fixed top-8 left-1/2 transform -translate-x-1/2 z-50">
+      <div className="fixed bottom-4 left-4 z-50">
         <button 
           onClick={handlePlayPause}
-          className="glass-card glass-hover p-6 transition-all duration-500 hover:scale-110 bg-primary/20"
+          className="glass-card glass-hover p-4 transition-all duration-500 hover:scale-105 bg-primary/10"
         >
           <Play className="w-4 h-4 text-primary" />
         </button>
@@ -287,7 +277,7 @@ const MusicPlayer: React.FC = () => {
   }
 
   return (
-    <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 animate-scale-in">
+    <div className="fixed bottom-4 left-4 z-50 animate-scale-in">
       <div className="glass-card glass-hover px-6 py-4 transition-all duration-500 bg-primary/20 min-w-[300px] max-w-[400px] w-full">
         {/* Header with close button */}
         <div className="flex items-center justify-between mb-4">

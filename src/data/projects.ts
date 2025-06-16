@@ -6,7 +6,7 @@ export interface Project {
   githubUrlFE?: string;
   githubUrlBE?: string;
   liveUrl?: string;
-  type: "web-app" | "software" | "fullstack";
+  type: "web-app" | "software" | "fullstack" | "mobile";
   slug: string;
   featuredImage?: string;
   details?: string;
@@ -87,7 +87,7 @@ export const projects: Project[] = [
     githubUrlFE: "https://github.com/duy08k4/WyA_Frontend",
     githubUrlBE: "https://github.com/duy08k4/WyA_Backend",
     liveUrl: "https://wy-a-introduction.vercel.app/",
-    type: "web-app",
+    type: "mobile",
     slug: "wya-chat",
     featuredImage: "/projects/wya-chat/featured.jpg",
     details: `WyA is an innovative location-based chat application that connects users in real-time based on their geographical proximity.

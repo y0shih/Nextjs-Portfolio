@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { Github, Linkedin, Mail } from 'lucide-react'
+import { Briefcase, Mail, MapPin, Github, Linkedin } from 'lucide-react'
 import profileImage from '../assets/images/profile.png'
+import profileBGImage from '../assets/images/house.png'
 import { motion } from 'framer-motion'
 import GradientText from "./ui/GradientText"
 
@@ -101,114 +102,114 @@ const HeroSection: React.FC = () => {
         <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]" />
       </div>
 
-
       <motion.div 
-        className="max-w-4xl mx-auto text-center relative z-20"
+        className="max-w-7xl mx-auto w-full relative z-20"
         variants={staggerContainer}
         initial="initial"
         animate="animate"
       >
-        {/* Profile Image */}
-        <motion.div 
-          className="glass-card rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center floating-animation"
-          variants={fadeInUpVariants}
-          whileHover={{ scale: 1.05, rotate: 5 }}
-          transition={{ 
-            duration: 0.3,
-            floating: {
-              y: [-10, 10, -10],
-              transition: {
-                duration: 6,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }
-            }
-          }}
-        >
-          <div className="w-24 h-24 bg-gradient-to-br from-pink-500 via-purple-500 to-blue-500 rounded-full flex items-center justify-center text-2xl font-bold text-white overflow-hidden relative">
-            <Image 
-              src={profileImage}
-              alt="Profile"
-              fill
-              className="object-cover object-center rounded-full"
-              priority
-            />
-          </div>
-        </motion.div>
-
-        {/* Name and Title */}
-        <motion.h1 
-          className="text-5xl md:text-7xl font-bold mb-4 glow-text"
-          variants={fadeInUpVariants}
-          whileHover={{ scale: 1.02 }}
-          transition={{ duration: 0.3 }}
-        >
-          Do Phu Trong
-        </motion.h1>
-        <motion.h2 
-          className="text-2xl md:text-3xl font-bold mb-6"
-          variants={fadeInUpVariants}
-        >
-          <GradientText>
-            I am a {currentText}
-          </GradientText>
-        </motion.h2>
-        
-        {/* Description */}
-        <motion.p 
-          className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed"
-          variants={fadeInUpVariants}
-        >
-          Engineering resilient and scalable digital ecosystems, driven by a performance-first mindset, robust security principles,
-           and a commitment to elegant, maintainable architecture.
-        </motion.p>
-
-        {/* Social Links */}
-        <motion.div 
-          className="flex justify-center space-x-4 mb-8"
-          variants={fadeInUpVariants}
-        >
-          {[
-            { icon: Github, href: 'https://github.com/y0shih', label: 'GitHub Profile' },
-            { icon: Linkedin, href: 'https://linkedin.com/in/', label: 'LinkedIn Profile' },
-            { icon: Mail, href: 'mailto:trongh1337@gmail.com', label: 'Email' }
-          ].map((social) => (
-            <motion.a
-              key={social.label}
-              href={social.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="glass-card glass-hover rounded-xl p-3"
-              aria-label={social.label}
-              whileHover={{ 
-                scale: 1.1,
-                transition: { duration: 0.1 }
-              }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <social.icon className="w-6 h-6 text-foreground" />
-            </motion.a>
-          ))}
-        </motion.div>
-
-        {/* CTA Button */}
-        {/* Commented out download resume button
-        <motion.div variants={fadeInUpVariants}>
-          <motion.button 
-            onClick={() => window.open('/CV-Intern.pdf', '_blank')}
-            className="glass-card glass-hover rounded-xl px-8 py-4 text-foreground font-semibold flex items-center mx-auto space-x-2"
-            whileHover={{ 
-              scale: 1.05,
-              boxShadow: "0 0 20px rgba(255,255,255,0.2)"
-            }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ duration: 0.1 }}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Left Side - Profile Card */}
+          <motion.div 
+            className="glass-card rounded-2xl p-6 relative overflow-hidden lg:max-w-md mx-auto w-full flex flex-col items-center shadow-lg"
+            variants={fadeInUpVariants}
           >
-            <Download className="w-5 h-5" />
-            <span>Download Resume</span>
-          </motion.button>
-        </motion.div>
-        */}
+            {/* Wavy background placeholder */}
+            <div className="relative glass-card top-0 left-0 w-full h-48 rounded-t-2xl">
+              <Image
+                src={profileBGImage}
+                alt="Background Profile Banner"
+                layout="fill"
+                objectFit="cover"
+                className="rounded-t-2xl"
+              />
+              {/* Profile Image - positioned to overlap */}
+              <div className="absolute z-10 w-40 h-40 rounded-full overflow-hidden border-4 border-transparent bg-transparent shadow-md left-1/2 -translate-x-1/2 bottom-[-80px]">
+                <Image
+                  src={profileImage}
+                  alt="Profile"
+                  width={160}
+                  height={160}
+                  className="object-cover object-center"
+                  priority
+                />
+              </div>
+            </div>
+            
+            {/* Profile Info */}
+            <div className="text-2xl font-bold text-center mb-1 pt-[80px]">Do Phu Trong</div>
+            <div className="text-lg text-primary flex items-center space-x-2 mb-4">
+              <Briefcase className="w-5 h-5 text-blue-400" />
+              {/* <span>Software Engineer</span> */}
+            </div>
+            <div className="text-lg text-muted-foreground mb-2 flex items-center space-x-2">
+              <Mail className="w-5 h-5 text-gray-400" />
+              <span>trongh1337@gmail.com</span>
+            </div>
+            <div className="text-lg text-muted-foreground mb-2 flex items-center space-x-2">
+              <MapPin className="w-5 h-5 text-gray-400" />
+              <span>Ho Chi Minh, Viet Nam</span>
+            </div>
+          </motion.div>
+
+          {/* Right Side - Original Hero Content (adjusted for left alignment in grid) */}
+          <div className="text-center lg:text-left">
+            {/* Name and Title (from original HeroSection) */}
+            <motion.h1 
+              className="text-5xl md:text-7xl font-bold mb-4 glow-text"
+              variants={fadeInUpVariants}
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.3 }}
+            >
+              {/* Do Phu Trong */}
+            </motion.h1>
+            <motion.h2 
+              className="text-2xl md:text-3xl font-bold mb-6"
+              variants={fadeInUpVariants}
+            >
+              <GradientText>
+                I am a {currentText}
+              </GradientText>
+            </motion.h2>
+            
+            {/* Description (from original HeroSection) */}
+            <motion.p 
+              className="text-lg text-muted-foreground max-w-2xl mx-auto lg:mx-0 mb-8 leading-relaxed"
+              variants={fadeInUpVariants}
+            >
+              Engineering resilient and scalable digital ecosystems, driven by a performance-first mindset, robust security principles,
+              and a commitment to elegant, maintainable architecture.
+            </motion.p>
+
+            {/* Social Links (from original HeroSection) */}
+            <motion.div 
+              className="flex justify-center lg:justify-start space-x-4 mb-8"
+              variants={fadeInUpVariants}
+            >
+              {[
+                { icon: Github, href: 'https://github.com/y0shih', label: 'GitHub Profile' },
+                { icon: Linkedin, href: 'https://linkedin.com/in/', label: 'LinkedIn Profile' },
+                { icon: Mail, href: 'mailto:trongh1337@gmail.com', label: 'Email' }
+              ].map((social) => (
+                <motion.a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="glass-card glass-hover rounded-xl p-3"
+                  aria-label={social.label}
+                  whileHover={{ 
+                    scale: 1.1,
+                    transition: { duration: 0.1 }
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <social.icon className="w-6 h-6 text-foreground" />
+                </motion.a>
+              ))}
+            </motion.div>
+          </div>
+        </div>
       </motion.div>
     </section>
   )

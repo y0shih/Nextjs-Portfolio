@@ -170,7 +170,7 @@ const ContactSection: React.FC = () => {
 
   return (
     <section className="py-24 px-6 bg-black/50 backdrop-blur-sm relative">
-      <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/30 -z-10" />
+      <div className="absolute inset-0 from-black/50 -z-10" />
       <div className="max-w-4xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
