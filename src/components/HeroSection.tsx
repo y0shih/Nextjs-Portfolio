@@ -19,7 +19,7 @@ const HeroSection: React.FC = () => {
   // Video configuration
   const videos = useMemo(() => [
     { src: "/videos/transitions/car5.mp4", start: 1000, duration: 8000 }, // starts at 1 second
-    { src: "/videos/transitions/car.mp4", start: 0, duration: 4000 }, // starts at beginning
+    { src: "/videos/transitions/car.mp4", start: 0, duration: 2000 }, // starts at beginning
     { src: "/videos/transitions/car4.mp4", start: 0, duration: 8000 }, // starts at 2 seconds
   ], []);
 
