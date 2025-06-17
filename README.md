@@ -1,4 +1,4 @@
-# Hoang Nguyen's Portfolio
+# Portfolio
 
 ![Portfolio Preview](/preview.png)
 
