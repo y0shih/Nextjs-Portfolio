@@ -49,8 +49,9 @@
 
   body {
     @apply bg-background text-foreground;
-    background: radial-gradient(ellipse at top, hsl(200, 100%, 8%), hsl(0, 0%, 3%));
+    background: black;
     min-height: 100vh;
+    overflow-x: hidden;
   }
 }
 
@@ -154,4 +155,31 @@
 
 .read-the-docs {
   color: #888;
+}
+
+/* Add these styles */
+html {
+  scroll-behavior: smooth;
+}
+
+section {
+  position: relative;
+  transition: transform 0.5s ease-out;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.active-section {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Optional: Hide scrollbar but keep functionality */
+main {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+main::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }

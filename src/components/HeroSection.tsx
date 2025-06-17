@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import Image from 'next/image'
 import { Briefcase, Mail, MapPin, Github, Linkedin } from 'lucide-react'
 import profileImage from '../assets/images/profile.png'
 import profileBGImage from '../assets/images/house.png'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import GradientText from "./ui/GradientText"
 
 const HeroSection: React.FC = () => {
@@ -16,12 +16,46 @@ const HeroSection: React.FC = () => {
     { text: "Software Developer" }
   ];
 
+  // Video configuration
+  const videos = useMemo(() => [
+    { src: "/videos/transitions/car5.mp4", start: 1000, duration: 8000 }, // starts at 1 second
+    { src: "/videos/transitions/car.mp4", start: 0, duration: 4000 }, // starts at beginning
+    { src: "/videos/transitions/car4.mp4", start: 0, duration: 8000 }, // starts at 2 seconds
+  ], []);
+
   const [roleIndex, setRoleIndex] = useState(0);
   const [currentText, setCurrentText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  
   const typingSpeed = 150; // milliseconds per character
   const deletingSpeed = 100; // milliseconds per character
   const delayBetweenRoles = 1500; // milliseconds
+
+  // Video transition effect
+  useEffect(() => {
+    console.log(`Current video index: ${currentVideoIndex}, playing: ${videos[currentVideoIndex].src}`);
+    
+    const videoTimer = setTimeout(() => {
+      console.log(`Transitioning to next video after ${videos[currentVideoIndex].duration}ms`);
+      setCurrentVideoIndex((prevIndex) => (prevIndex + 1) % videos.length);
+    }, videos[currentVideoIndex].duration);
+
+    return () => clearTimeout(videoTimer);
+  }, [currentVideoIndex, videos]);
+
+  const handleVideoLoad = () => {
+    console.log(`Video loaded: ${videos[currentVideoIndex].src}`);
+    // Set the start time when video loads
+    if (videoRef.current && videos[currentVideoIndex].start) {
+      videoRef.current.currentTime = videos[currentVideoIndex].start / 1000; // Convert ms to seconds
+    }
+  };
+
+  const handleVideoError = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+    console.error(`Video error: ${videos[currentVideoIndex].src}`, e);
+  };
 
   useEffect(() => {
     const handleTyping = () => {
@@ -48,18 +82,6 @@ const HeroSection: React.FC = () => {
     return () => clearTimeout(timer);
   }, [currentText, isDeleting, roleIndex, roles]);
 
-  // const floatingVariants = {
-  //   initial: { y: 0 },
-  //   animate: {
-  //     y: [-10, 10, -10],
-  //     transition: {
-  //       duration: 6,
-  //       repeat: Infinity,
-  //       ease: "easeInOut"
-  //     }
-  //   }
-  // };
-
   const fadeInUpVariants = {
     initial: { opacity: 0, y: 20 },
     animate: { 
@@ -77,29 +99,56 @@ const HeroSection: React.FC = () => {
     }
   };
 
+  const videoVariants = {
+    enter: { opacity: 0 },
+    center: { opacity: 1 },
+    exit: { opacity: 0 }
+  };
+
   return (
-    <section className="min-h-screen flex items-center justify-center px-6 relative overflow-hidden">
+    <section className="min-h-screen w-full relative flex items-center justify-center px-6 snap-start">
       {/* Video Background */}
       <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute min-w-full min-h-full object-cover"
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '100%',
-            height: '100%',
-          }}
-        >
-          <source src="/videos/sss.mp4" type="video/mp4" />
-        </video>
-        {/* Dark overlay to ensure content visibility */}
-        <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]" />
+        {/* Debug info - remove in production */}
+        <div className="absolute top-4 left-4 z-50 bg-black/70 text-white px-3 py-1 rounded text-sm">
+          {/* Video {currentVideoIndex + 1}/{videos.length}: {videos[currentVideoIndex].src.split('/').pop()} */}
+        </div>
+        
+        <AnimatePresence mode="wait">
+          <motion.video
+            key={currentVideoIndex}
+            autoPlay
+            muted
+            playsInline
+            className="absolute min-w-full min-h-full object-cover"
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '100%',
+              height: '100%',
+            }}
+            variants={videoVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            onLoad={handleVideoLoad}
+            onError={handleVideoError}
+            onLoadedData={handleVideoLoad}
+            ref={videoRef}
+          >
+            <source src={videos[currentVideoIndex].src} type="video/mp4" />
+            Your browser does not support the video tag.
+          </motion.video>
+        </AnimatePresence>
+        
+        {/* tinted overlay */}
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
+        
+        {/*  gradient overlay for better contrast */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30" />
       </div>
 
       <motion.div 
@@ -111,7 +160,7 @@ const HeroSection: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Side - Profile Card */}
           <motion.div 
-            className="glass-card rounded-2xl p-6 relative overflow-hidden lg:max-w-md mx-auto w-full flex flex-col items-center shadow-lg"
+            className="glass-card rounded-2xl p-6 relative overflow-hidden lg:max-w-md mx-auto w-full flex flex-col items-center shadow-lg backdrop-blur-md"
             variants={fadeInUpVariants}
           >
             {/* Wavy background placeholder */}
@@ -152,7 +201,7 @@ const HeroSection: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Right Side - Original Hero Content (adjusted for left alignment in grid) */}
+          {/* */}
           <div className="text-center lg:text-left">
             {/* Name and Title (from original HeroSection) */}
             <motion.h1 
@@ -174,7 +223,7 @@ const HeroSection: React.FC = () => {
             
             {/* Description (from original HeroSection) */}
             <motion.p 
-              className="text-lg text-muted-foreground max-w-2xl mx-auto lg:mx-0 mb-8 leading-relaxed "
+              className="text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 mb-8 leading-relaxed "
               variants={fadeInUpVariants}
             >
               Engineering resilient and scalable digital ecosystems, driven by a performance-first mindset, robust security principles,

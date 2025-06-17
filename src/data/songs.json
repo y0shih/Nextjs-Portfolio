@@ -8,13 +8,21 @@
       "url": "/music/mck.mp3",
       "coverUrl": "/covers/mck.jpg"
     },
-    {
-      "id": "2",
-      "title": "alien are ghosts",
-      "artist": "suicideboys",
-      "duration": 133,
-      "url": "/music/$b.mp3",
-      "coverUrl": "/covers/$b.jpg"
-    }
+      {
+    "id": "3",
+    "title": "24",
+    "artist": "Kanye West",
+    "duration": 133,
+    "url": "/music/24.mp3",
+    "coverUrl": "/covers/$b.jpg"
+  },
+      {
+    "id": "4",
+    "title": "Flashing Lights",
+    "artist": "Kanye West",
+    "duration": 133,
+    "url": "/music/flight.mp3",
+    "coverUrl": "/covers/$b.jpg"
+  }
   ]
 } 
