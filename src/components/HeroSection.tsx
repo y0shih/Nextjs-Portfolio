@@ -106,7 +106,7 @@ const HeroSection: React.FC = () => {
   };
 
   return (
-    <section className="min-h-screen w-full relative flex items-center justify-center px-6 snap-start">
+    <section className="h-screen w-full relative flex items-center justify-center px-6 snap-start">
       {/* Video Background */}
       <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
         {/* Debug info - remove in production */}

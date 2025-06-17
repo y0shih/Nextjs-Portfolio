@@ -65,10 +65,10 @@ const AboutSection: React.FC = () => {
   // };
 
   return (
-    <section className="py-24 px-6 bg-black backdrop-blur-sm relative">
+    <section className="h-screen py-12 px-6 bg-black backdrop-blur-sm relative flex items-center">
       <div className="absolute inset-0 from-black/50 -z-10" />
       <motion.div 
-        className="max-w-6xl mx-auto"
+        className="max-w-6xl mx-auto w-full"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
@@ -76,18 +76,18 @@ const AboutSection: React.FC = () => {
       >
         {/* Section Header */}
         <motion.div 
-          className="text-center mb-16"
+          className="text-center mb-8"
           variants={itemVariants}
         >
           <motion.h2 
-            className="text-4xl md:text-5xl font-bold mb-6 glow-text"
+            className="text-3xl md:text-4xl font-bold mb-4 glow-text"
             whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.2 }}
           >
             About Me
           </motion.h2>
           <motion.p 
-            className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed"
+            className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed"
             variants={itemVariants}
           >
             I&apos;m a backend-focused developer with a background in data analysis. I specialize in building efficient APIs, managing databases, and deploying scalable systems using Node.js, TypeScript, Python and PostgreSQL. Passionate about clean code and continuous learning.
@@ -96,7 +96,7 @@ const AboutSection: React.FC = () => {
 
         {/* Skills Grid */}
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          className="grid grid-cols-1 md:grid-cols-2 gap-4"
           variants={containerVariants}
         >
           {skills.map((skill, index) => (

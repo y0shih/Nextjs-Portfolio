@@ -72,28 +72,28 @@ const TechnicalExpertiseSection: React.FC = () => {
   }
 
   return (
-    <section className="py-24 px-6 bg-black backdrop-blur-sm relative">
+    <section className="h-screen py-12 px-6 bg-black backdrop-blur-sm relative flex items-center">
       <div className="absolute inset-0 from-black/50 -z-10" />
       <motion.div 
-        className="max-w-6xl mx-auto overflow-hidden"
+        className="max-w-6xl mx-auto w-full overflow-hidden"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
       >
         {/* Section Header */}
         <motion.div 
-          className="text-center mb-16"
+          className="text-center mb-8"
           variants={itemVariants}
         >
           <motion.h2 
-            className="text-4xl md:text-5xl font-bold mb-6 glow-text"
+            className="text-3xl md:text-4xl font-bold mb-4 glow-text"
             whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.2 }}
           >
             Technical Expertise
           </motion.h2>
           <motion.p 
-            className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed"
+            className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed"
             variants={itemVariants}
           >
             A comprehensive overview of my programming language expertise and technical skills.
@@ -109,10 +109,10 @@ const TechnicalExpertiseSection: React.FC = () => {
           {duplicatedLanguages.map((language) => (
             <motion.div
               key={language.name}
-              className="inline-flex items-center space-x-4 mx-8 p-4 glass-card rounded-lg flex-shrink-0 bg-black/30 backdrop-blur-sm"
+              className="inline-flex items-center space-x-4 mx-6 p-3 glass-card rounded-lg flex-shrink-0 bg-black/30 backdrop-blur-sm"
             >
-              <img src={language.logoPath} alt={language.name} className="w-10 h-10" />
-              <h4 className="text-xl font-semibold text-foreground">
+              <img src={language.logoPath} alt={language.name} className="w-8 h-8" />
+              <h4 className="text-lg font-semibold text-foreground">
                 {language.name}
               </h4>
             </motion.div>
