@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { Mail, Phone, MapPin, Send } from 'lucide-react'
 import emailjs from '@emailjs/browser'
+import Footer from './Footer'
 
 // Rate limiting configuration
 const RATE_LIMIT = {
@@ -167,15 +168,15 @@ const ContactSection: React.FC = () => {
   };
 
   const isRateLimited = emailCount >= RATE_LIMIT.maxEmails;
-// 
+
   return (
-    <section className="py-24 px-6 bg-black backdrop-blur-sm relative">
+    <section className="h-screen py-12 px-6 bg-black backdrop-blur-sm relative flex items-center">
       <div className="absolute inset-0 from-black/50 -z-10" />
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto w-full">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 glow-text">Get In Touch</h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 glow-text">Get In Touch</h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Let&apos;s work together to bring your ideas to life. I&apos;m always excited to discuss new opportunities and projects.
           </p>
           {emailCount > 0 && (
@@ -186,43 +187,43 @@ const ContactSection: React.FC = () => {
           )}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Contact Info */}
-          <div className="space-y-6">
-            <div className="glass-card glass-hover rounded-xl p-6 flex items-center space-x-4 fade-in-up bg-black/30 backdrop-blur-sm group transition-all duration-300 hover:scale-[1.02]">
-              <div className="glass-card rounded-lg p-3">
-                <Mail className="w-6 h-6 text-primary" />
+          <div className="space-y-4">
+            <div className="glass-card glass-hover rounded-xl p-4 flex items-center space-x-4 fade-in-up bg-black/30 backdrop-blur-sm group transition-all duration-300 hover:scale-[1.02]">
+              <div className="glass-card rounded-lg p-2">
+                <Mail className="w-5 h-5 text-primary" />
               </div>
               <div>
                 <h3 className="font-semibold text-foreground transition-all duration-300 group-hover:text-blue-400 group-hover:glow-text">Email</h3>
-                <p className="text-muted-foreground">trongh1337@gmail.com</p>
+                <p className="text-sm text-muted-foreground">trongh1337@gmail.com</p>
               </div>
             </div>
 
-            <div className="glass-card glass-hover rounded-xl p-6 flex items-center space-x-4 fade-in-up bg-black/30 backdrop-blur-sm group transition-all duration-300 hover:scale-[1.02]" style={{ animationDelay: '150ms' }}>
-              <div className="glass-card rounded-lg p-3">
-                <Phone className="w-6 h-6 text-primary" />
+            <div className="glass-card glass-hover rounded-xl p-4 flex items-center space-x-4 fade-in-up bg-black/30 backdrop-blur-sm group transition-all duration-300 hover:scale-[1.02]" style={{ animationDelay: '150ms' }}>
+              <div className="glass-card rounded-lg p-2">
+                <Phone className="w-5 h-5 text-primary" />
               </div>
               <div>
                 <h3 className="font-semibold text-foreground transition-all duration-300 group-hover:text-blue-400 group-hover:glow-text">Phone</h3>
-                <p className="text-muted-foreground">+84 344 427 301</p>
+                <p className="text-sm text-muted-foreground">+84 344 427 301</p>
               </div>
             </div>
 
-            <div className="glass-card glass-hover rounded-xl p-6 flex items-center space-x-4 fade-in-up bg-black/30 backdrop-blur-sm group transition-all duration-300 hover:scale-[1.02]" style={{ animationDelay: '300ms' }}>
-              <div className="glass-card rounded-lg p-3">
-                <MapPin className="w-6 h-6 text-primary" />
+            <div className="glass-card glass-hover rounded-xl p-4 flex items-center space-x-4 fade-in-up bg-black/30 backdrop-blur-sm group transition-all duration-300 hover:scale-[1.02]" style={{ animationDelay: '300ms' }}>
+              <div className="glass-card rounded-lg p-2">
+                <MapPin className="w-5 h-5 text-primary" />
               </div>
               <div>
                 <h3 className="font-semibold text-foreground transition-all duration-300 group-hover:text-blue-400 group-hover:glow-text">Location</h3>
-                <p className="text-muted-foreground">Ho Chi Minh City, Vietnam</p>
+                <p className="text-sm text-muted-foreground">Ho Chi Minh City, Vietnam</p>
               </div>
             </div>
           </div>
 
           {/* Contact Form */}
-          <div className="glass-card rounded-2xl p-8 fade-in-up bg-black/30 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02]" style={{ animationDelay: '450ms' }}>
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="glass-card rounded-2xl p-6 fade-in-up bg-black/30 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02]" style={{ animationDelay: '450ms' }}>
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2 transition-all duration-300 group-hover:text-blue-400 group-hover:glow-text">Name</label>
                 <input 
@@ -231,7 +232,7 @@ const ContactSection: React.FC = () => {
                   type="text" 
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full glass-card rounded-lg px-4 py-3 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 hover:scale-[1.02] focus:scale-[1.02] focus:text-blue-400 focus:glow-text disabled:opacity-50 disabled:cursor-not-allowed" 
+                  className="w-full glass-card rounded-lg px-3 py-2 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 hover:scale-[1.02] focus:scale-[1.02] focus:text-blue-400 focus:glow-text disabled:opacity-50 disabled:cursor-not-allowed" 
                   placeholder="Your name"
                   required
                   disabled={status.type === 'loading' || isRateLimited}
@@ -246,7 +247,7 @@ const ContactSection: React.FC = () => {
                   type="email" 
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full glass-card rounded-lg px-4 py-3 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 hover:scale-[1.02] focus:scale-[1.02] focus:text-blue-400 focus:glow-text disabled:opacity-50 disabled:cursor-not-allowed" 
+                  className="w-full glass-card rounded-lg px-3 py-2 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 hover:scale-[1.02] focus:scale-[1.02] focus:text-blue-400 focus:glow-text disabled:opacity-50 disabled:cursor-not-allowed" 
                   placeholder="your.email@example.com"
                   required
                   disabled={status.type === 'loading' || isRateLimited}
@@ -258,10 +259,10 @@ const ContactSection: React.FC = () => {
                 <textarea 
                   id="message"
                   name="message"
-                  rows={4}
+                  rows={3}
                   value={formData.message}
                   onChange={handleChange}
-                  className="w-full glass-card rounded-lg px-4 py-3 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none transition-all duration-300 hover:scale-[1.02] focus:scale-[1.02] focus:text-blue-400 focus:glow-text disabled:opacity-50 disabled:cursor-not-allowed" 
+                  className="w-full glass-card rounded-lg px-3 py-2 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none transition-all duration-300 hover:scale-[1.02] focus:scale-[1.02] focus:text-blue-400 focus:glow-text disabled:opacity-50 disabled:cursor-not-allowed" 
                   placeholder="Tell me about your project..."
                   required
                   disabled={status.type === 'loading' || isRateLimited}
@@ -269,7 +270,7 @@ const ContactSection: React.FC = () => {
               </div>
 
               {status.message && (
-                <div className={`p-4 rounded-lg ${
+                <div className={`p-3 rounded-lg text-sm ${
                   status.type === 'success' ? 'bg-green-500/20 text-green-400' :
                   status.type === 'error' ? 'bg-red-500/20 text-red-400' :
                   'bg-blue-500/20 text-blue-400'
@@ -303,6 +304,7 @@ const ContactSection: React.FC = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </section>
   )
 }

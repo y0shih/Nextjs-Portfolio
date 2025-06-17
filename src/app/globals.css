@@ -162,24 +162,91 @@ html {
   scroll-behavior: smooth;
 }
 
-section {
-  position: relative;
-  transition: transform 0.5s ease-out;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
+body {
+  overflow-x: hidden;
 }
 
-.active-section {
-  transform: translateY(0);
-  opacity: 1;
+/* Smooth scroll snap */
+.snap-container {
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.snap-section {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  height: 100vh;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
 }
 
 /* Optional: Hide scrollbar but keep functionality */
-main {
+.snap-container {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
 }
 
-main::-webkit-scrollbar {
+.snap-container::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
+}
+
+/* Smooth transitions for section changes */
+.snap-section {
+  transition: all 0.3s ease-out;
+}
+
+/* Active section styling */
+.snap-section.active {
+  transform: scale(1.02);
+}
+
+/* Ensure sections take full height */
+.snap-section > * {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow-y: auto;
+}
+
+/* Special handling for contact section to include footer */
+#contact {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#contact > *:not(footer) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Footer styling within contact section */
+#contact footer {
+  flex-shrink: 0;
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+/* Navigation hover effect */
+.nav-container {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.nav-container:hover {
+  opacity: 1;
+}
+
+/* Show navigation when hovering on the right side of screen */
+.snap-container:hover .nav-container {
+  opacity: 1;
 }
