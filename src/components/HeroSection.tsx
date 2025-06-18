@@ -20,7 +20,7 @@ const HeroSection: React.FC = () => {
   const videos = useMemo(() => [
     { src: "/videos/transitions/3.mp4", start: 1000, duration: 11000 }, // starts at 1 second
     { src: "/videos/transitions/2.mp4", start: 0, duration: 10000 }, // starts at beginning
-    { src: "/videos/transitions/1.mp4", start: 0, duration: 10000 }, // starts at 2 seconds
+    { src: "/videos/transitions/1.mp4", start: 0, duration: 8000 }, // starts at 2 seconds
   ], []);
 
   const [roleIndex, setRoleIndex] = useState(0);

@@ -4,7 +4,7 @@ import AnimatedTitle from "@/components/AnimatedTitle"
 
 export const metadata = {
   title: 'trongphu.tech',
-  description: 'Welcome to my portfolio : ) ',
+  description: 'Portfolio ',
 }
 
 export default function RootLayout({
