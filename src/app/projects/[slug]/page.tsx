@@ -5,9 +5,7 @@ import { useParams } from "next/navigation";
 import { Github, ExternalLink, Code2, Database, Globe, ChevronDown, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-
-// Import the same Project interface and projects data
-import { projects } from "@/data/projects"; // We'll create this file next
+import { projects } from "@/data/projects";
 
 const ProjectDetail = () => {
   const params = useParams();

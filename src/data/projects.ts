@@ -20,13 +20,13 @@ export const projects: Project[] = [
     title: "MeoStationery - E-Commerce Web App",
     description:
       "A full-stack e-commerce platform built with Next.js, Node.js, Prisma and PostgreSQL. Features include real-time inventory management, payment processing, and admin dashboard.",
-    technologies: ["Next.js", "Node.js", "PostgreSQL", "Tembo.io", "Prisma"],
+    technologies: ["Next.js", "PostgreSQL", "Tembo.io", "Prisma"],
     githubUrl: "https://github.com/Goatt69/meo_stationery",
     liveUrl: "https://meostationery.netlify.app/",
     type: "fullstack",
     slug: "meo-stationery",
-    featuredImage: "/projects/meo-stationery/featured.jpg",
-    details: `MeoStationery is a comprehensive e-commerce platform designed for stationery products. 
+    featuredImage: "/projects/meo-stationery/featured.png",
+    details: `meo-stationery", is a comprehensive e-commerce platform designed for stationery products. 
     The platform features a modern, responsive design and robust backend infrastructure.
     
     Key technical achievements include:
@@ -45,9 +45,8 @@ export const projects: Project[] = [
       "Shopping cart and wishlist functionality"
     ],
     gallery: [
-      "/projects/meo-stationery/gallery-1.jpg",
-      "/projects/meo-stationery/gallery-2.jpg",
-      "/projects/meo-stationery/gallery-3.jpg"
+      "/projects/meo-stationery/1.png",
+      "/projects/meo-stationery/2.png",
     ],
     // demoVideo: "https://www.youtube.com/embed/your-video-id"
   },
@@ -58,7 +57,7 @@ export const projects: Project[] = [
     githubUrl: "https://github.com/y0shih/deadlock-cheese",
     type: "software",
     slug: "deadlock-esp",
-    featuredImage: "/projects/deadlock-esp/featured.jpg",
+    featuredImage: "/projects/deadlock/1.png",
     details: `Deadlock ESP is a game enhancement tool developed using Rust and C#. 
     The project demonstrates advanced memory manipulation and game engine interaction techniques.
     
@@ -75,8 +74,8 @@ export const projects: Project[] = [
       "Anti-detection mechanisms"
     ],
     gallery: [
-      "/projects/deadlock-esp/gallery-1.jpg",
-      "/projects/deadlock-esp/gallery-2.jpg"
+      "/projects/deadlock/1.png",
+      "/projects/deadlock/2.png"
     ]
   },
   {
@@ -120,22 +119,21 @@ export const projects: Project[] = [
     description:
       "A modern portfolio website showcasing projects and skills. Built with Next.js and Tailwind CSS, featuring smooth animations and responsive design.",
     technologies: ["Next.js", "TypeScript", "Tailwind CSS", "Framer Motion"],
+    githubUrl: "https://github.com/y0shih/Nextjs-Portfolio",
     liveUrl: "https://nextjs-portfolio-u735.vercel.app/",
     type: "web-app",
     slug: "portfolio",
-    featuredImage: "/projects/portfolio/featured.jpg",
-    details: `A modern, responsive portfolio website built with Next.js and Tailwind CSS.
-    The site features smooth animations, dark mode support, and a clean, professional design.
+    featuredImage: "/projects/portfolio/featured.png",
+    details: `A modern, responsive portfolio website built with Next.js and Love.
+    The site features smooth animations, and a clean, professional design.
     
     Key features:
     - Server-side rendering with Next.js
     - Responsive design with Tailwind CSS
     - Smooth animations with Framer Motion
-    - Dark mode support
     - SEO optimization`,
     features: [
       "Responsive design",
-      "Dark mode support",
       "Smooth animations",
       "Project showcase",
       "Contact form",
@@ -143,8 +141,8 @@ export const projects: Project[] = [
       "Performance optimized"
     ],
     gallery: [
-      "/projects/portfolio/gallery-1.jpg",
-      "/projects/portfolio/gallery-2.jpg"
+      "/projects/portfolio/1.png",
+      "/projects/portfolio/2.png"
     ]
   }
 ]; 

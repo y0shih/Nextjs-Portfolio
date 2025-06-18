@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { Mail, Phone, MapPin, Send } from 'lucide-react'
 import emailjs from '@emailjs/browser'
 import Footer from './Footer'
+import { motion } from 'framer-motion'
 
 // Rate limiting configuration
 const RATE_LIMIT = {
@@ -169,70 +170,151 @@ const ContactSection: React.FC = () => {
 
   const isRateLimited = emailCount >= RATE_LIMIT.maxEmails;
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+        delayChildren: 0.3
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut"
+      }
+    }
+  };
+
   return (
-    <section className="h-screen py-12 px-6 bg-black backdrop-blur-sm relative flex items-center">
+    <section className="h-screen py-8 px-6 bg-black backdrop-blur-sm relative flex items-center">
       <div className="absolute inset-0 from-black/50 -z-10" />
-      <div className="max-w-4xl mx-auto w-full">
+      <motion.div 
+        className="max-w-4xl mx-auto w-full"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={containerVariants}
+      >
         {/* Section Header */}
-        <div className="text-center mb-8">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 glow-text">Get In Touch</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+        <motion.div 
+          className="text-center mb-6"
+          variants={itemVariants}
+        >
+          <motion.h2 
+            className="text-2xl md:text-3xl font-bold mb-2 glow-text"
+            whileHover={{ scale: 1.02 }}
+            transition={{ duration: 0.2 }}
+          >
+            Contact Me
+          </motion.h2>
+          <motion.p 
+            className="text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed"
+            variants={itemVariants}
+          >
             Let&apos;s work together to bring your ideas to life. I&apos;m always excited to discuss new opportunities and projects.
-          </p>
+          </motion.p>
           {emailCount > 0 && (
-            <p className="text-sm text-muted-foreground mt-2">
+            <motion.p 
+              className="text-xs text-muted-foreground mt-1"
+              variants={itemVariants}
+            >
               {emailCount} of {RATE_LIMIT.maxEmails} messages sent in the last 24 hours
               {timeUntilReset > 0 && ` (Reset in ${formatTimeUntilReset(timeUntilReset)})`}
-            </p>
+            </motion.p>
           )}
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <motion.div 
+          className="grid grid-cols-1 lg:grid-cols-2 gap-4"
+          variants={containerVariants}
+        >
           {/* Contact Info */}
-          <div className="space-y-4">
-            <div className="glass-card glass-hover rounded-xl p-4 flex items-center space-x-4 fade-in-up bg-black/30 backdrop-blur-sm group transition-all duration-300 hover:scale-[1.02]">
+          <motion.div 
+            className="space-y-3"
+            variants={containerVariants}
+          >
+            <motion.div 
+              className="glass-card glass-hover rounded-lg p-3 flex items-center space-x-3 fade-in-up bg-black/30 backdrop-blur-sm group transition-all duration-300 hover:scale-[1.02]"
+              variants={itemVariants}
+              whileHover={{ 
+                scale: 1.02,
+                transition: { duration: 0.2 }
+              }}
+            >
               <div className="glass-card rounded-lg p-2">
-                <Mail className="w-5 h-5 text-primary" />
+                <Mail className="w-4 h-4 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold text-foreground transition-all duration-300 group-hover:text-blue-400 group-hover:glow-text">Email</h3>
-                <p className="text-sm text-muted-foreground">trongh1337@gmail.com</p>
+                <h3 className="font-semibold text-sm text-foreground transition-all duration-300 group-hover:text-blue-400 group-hover:glow-text">Email</h3>
+                <p className="text-xs text-muted-foreground">trongh1337@gmail.com</p>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="glass-card glass-hover rounded-xl p-4 flex items-center space-x-4 fade-in-up bg-black/30 backdrop-blur-sm group transition-all duration-300 hover:scale-[1.02]" style={{ animationDelay: '150ms' }}>
+            <motion.div 
+              className="glass-card glass-hover rounded-lg p-3 flex items-center space-x-3 fade-in-up bg-black/30 backdrop-blur-sm group transition-all duration-300 hover:scale-[1.02]"
+              variants={itemVariants}
+              whileHover={{ 
+                scale: 1.02,
+                transition: { duration: 0.2 }
+              }}
+              style={{ animationDelay: '150ms' }}
+            >
               <div className="glass-card rounded-lg p-2">
-                <Phone className="w-5 h-5 text-primary" />
+                <Phone className="w-4 h-4 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold text-foreground transition-all duration-300 group-hover:text-blue-400 group-hover:glow-text">Phone</h3>
-                <p className="text-sm text-muted-foreground">+84 344 427 301</p>
+                <h3 className="font-semibold text-sm text-foreground transition-all duration-300 group-hover:text-blue-400 group-hover:glow-text">Phone</h3>
+                <p className="text-xs text-muted-foreground">+84 344 427 301</p>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="glass-card glass-hover rounded-xl p-4 flex items-center space-x-4 fade-in-up bg-black/30 backdrop-blur-sm group transition-all duration-300 hover:scale-[1.02]" style={{ animationDelay: '300ms' }}>
+            <motion.div 
+              className="glass-card glass-hover rounded-lg p-3 flex items-center space-x-3 fade-in-up bg-black/30 backdrop-blur-sm group transition-all duration-300 hover:scale-[1.02]"
+              variants={itemVariants}
+              whileHover={{ 
+                scale: 1.02,
+                transition: { duration: 0.2 }
+              }}
+              style={{ animationDelay: '300ms' }}
+            >
               <div className="glass-card rounded-lg p-2">
-                <MapPin className="w-5 h-5 text-primary" />
+                <MapPin className="w-4 h-4 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold text-foreground transition-all duration-300 group-hover:text-blue-400 group-hover:glow-text">Location</h3>
-                <p className="text-sm text-muted-foreground">Ho Chi Minh City, Vietnam</p>
+                <h3 className="font-semibold text-sm text-foreground transition-all duration-300 group-hover:text-blue-400 group-hover:glow-text">Location</h3>
+                <p className="text-xs text-muted-foreground">Ho Chi Minh City, Vietnam</p>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* Contact Form */}
-          <div className="glass-card rounded-2xl p-6 fade-in-up bg-black/30 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02]" style={{ animationDelay: '450ms' }}>
-            <form onSubmit={handleSubmit} className="space-y-4">
+          <motion.div 
+            className="glass-card rounded-xl p-4 fade-in-up bg-black/30 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02]"
+            variants={itemVariants}
+            whileHover={{ 
+              scale: 1.02,
+              transition: { duration: 0.2 }
+            }}
+            style={{ animationDelay: '450ms' }}
+          >
+            <form onSubmit={handleSubmit} className="space-y-3">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2 transition-all duration-300 group-hover:text-blue-400 group-hover:glow-text">Name</label>
+                <label htmlFor="name" className="block text-xs font-medium text-foreground mb-1 transition-all duration-300 group-hover:text-blue-400 group-hover:glow-text">Name</label>
                 <input 
                   id="name"
                   name="name"
                   type="text" 
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full glass-card rounded-lg px-3 py-2 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 hover:scale-[1.02] focus:scale-[1.02] focus:text-blue-400 focus:glow-text disabled:opacity-50 disabled:cursor-not-allowed" 
+                  className="w-full glass-card rounded-lg px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 hover:scale-[1.02] focus:scale-[1.02] focus:text-blue-400 focus:glow-text disabled:opacity-50 disabled:cursor-not-allowed" 
                   placeholder="Your name"
                   required
                   disabled={status.type === 'loading' || isRateLimited}
@@ -240,14 +322,14 @@ const ContactSection: React.FC = () => {
               </div>
               
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2 transition-all duration-300 group-hover:text-blue-400 group-hover:glow-text">Email</label>
+                <label htmlFor="email" className="block text-xs font-medium text-foreground mb-1 transition-all duration-300 group-hover:text-blue-400 group-hover:glow-text">Email</label>
                 <input 
                   id="email"
                   name="email"
                   type="email" 
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full glass-card rounded-lg px-3 py-2 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 hover:scale-[1.02] focus:scale-[1.02] focus:text-blue-400 focus:glow-text disabled:opacity-50 disabled:cursor-not-allowed" 
+                  className="w-full glass-card rounded-lg px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 hover:scale-[1.02] focus:scale-[1.02] focus:text-blue-400 focus:glow-text disabled:opacity-50 disabled:cursor-not-allowed" 
                   placeholder="your.email@example.com"
                   required
                   disabled={status.type === 'loading' || isRateLimited}
@@ -255,14 +337,14 @@ const ContactSection: React.FC = () => {
               </div>
               
               <div>
-                <label htmlFor="message" className="block text-sm font-medium text-foreground mb-2 transition-all duration-300 group-hover:text-blue-400 group-hover:glow-text">Message</label>
+                <label htmlFor="message" className="block text-xs font-medium text-foreground mb-1 transition-all duration-300 group-hover:text-blue-400 group-hover:glow-text">Message</label>
                 <textarea 
                   id="message"
                   name="message"
-                  rows={3}
+                  rows={2}
                   value={formData.message}
                   onChange={handleChange}
-                  className="w-full glass-card rounded-lg px-3 py-2 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none transition-all duration-300 hover:scale-[1.02] focus:scale-[1.02] focus:text-blue-400 focus:glow-text disabled:opacity-50 disabled:cursor-not-allowed" 
+                  className="w-full glass-card rounded-lg px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none transition-all duration-300 hover:scale-[1.02] focus:scale-[1.02] focus:text-blue-400 focus:glow-text disabled:opacity-50 disabled:cursor-not-allowed" 
                   placeholder="Tell me about your project..."
                   required
                   disabled={status.type === 'loading' || isRateLimited}
@@ -270,7 +352,7 @@ const ContactSection: React.FC = () => {
               </div>
 
               {status.message && (
-                <div className={`p-3 rounded-lg text-sm ${
+                <div className={`p-2 rounded-lg text-xs ${
                   status.type === 'success' ? 'bg-green-500/20 text-green-400' :
                   status.type === 'error' ? 'bg-red-500/20 text-red-400' :
                   'bg-blue-500/20 text-blue-400'
@@ -279,14 +361,16 @@ const ContactSection: React.FC = () => {
                 </div>
               )}
               
-              <button 
+              <motion.button 
                 type="submit" 
-                className="w-full glass-card glass-hover rounded-lg px-6 py-3 text-foreground font-semibold flex items-center justify-center space-x-2 transition-all duration-300 hover:scale-105 hover:text-blue-400 hover:glow-text disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full glass-card glass-hover rounded-lg px-4 py-2 text-sm text-foreground font-semibold flex items-center justify-center space-x-2 transition-all duration-300 hover:scale-105 hover:text-blue-400 hover:glow-text disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={status.type === 'loading' || isRateLimited}
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
               >
                 {status.type === 'loading' ? (
                   <>
-                    <div className="w-5 h-5 border-2 border-foreground border-t-transparent rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-foreground border-t-transparent rounded-full animate-spin" />
                     <span>Sending...</span>
                   </>
                 ) : isRateLimited ? (
@@ -295,15 +379,15 @@ const ContactSection: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <Send className="w-5 h-5" />
+                    <Send className="w-4 h-4" />
                     <span>Send Message</span>
                   </>
                 )}
-              </button>
+              </motion.button>
             </form>
-          </div>
-        </div>
-      </div>
+          </motion.div>
+        </motion.div>
+      </motion.div>
       <Footer />
     </section>
   )
