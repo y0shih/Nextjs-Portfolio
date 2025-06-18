@@ -21,7 +21,7 @@ export const projects: Project[] = [
     description:
       "A full-stack e-commerce platform built with Next.js, Node.js, Prisma and PostgreSQL. Features include real-time inventory management, payment processing, and admin dashboard.",
     technologies: ["Next.js", "PostgreSQL", "Tembo.io", "Prisma"],
-    githubUrl: "https://github.com/Goatt69/meo_stationery",
+    githubUrl: "https://github.com/y0shih/meo_stationery",
     liveUrl: "https://meostationery.netlify.app/",
     type: "fullstack",
     slug: "meo-stationery",
@@ -83,8 +83,8 @@ export const projects: Project[] = [
     description:
       "WyA is a real-time location-based chat app where users can join nearby chat rooms. Built with Ionic React, TypeScript, Nodejs with smooth animations powered by Framer Motion.",
     technologies: ["Ionic React", "TypeScript", "Nodejs", "Firebase"],
-    githubUrlFE: "https://github.com/duy08k4/WyA_Frontend",
-    githubUrlBE: "https://github.com/duy08k4/WyA_Backend",
+    githubUrlFE: "https://github.com/y0shih/WyA_Frontend",
+    githubUrlBE: "https://github.com/y0shih/WyA_Backend",
     liveUrl: "https://wy-a-introduction.vercel.app/",
     type: "mobile",
     slug: "wya-chat",
