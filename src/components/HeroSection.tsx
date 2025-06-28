@@ -1,44 +1,51 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect, useMemo, useRef } from 'react'
-import Image from 'next/image'
-import { Briefcase, Mail, MapPin, Github, Linkedin } from 'lucide-react'
-import profileImage from '../assets/images/profile.png'
-import profileBGImage from '../assets/images/house.png'
-import { motion, AnimatePresence } from 'framer-motion'
-import GradientText from "./ui/GradientText"
+import React, { useState, useEffect, useMemo, useRef } from "react";
+import Image from "next/image";
+import { Briefcase, Mail, MapPin, Github, Linkedin } from "lucide-react";
+import profileImage from "../assets/images/profile.png";
+import profileBGImage from "../assets/images/house.png";
+import { motion, AnimatePresence } from "framer-motion";
+import GradientText from "./ui/GradientText";
 
 const HeroSection: React.FC = () => {
   const roles = [
     { text: "Web Developer" },
     { text: "Data Analyst" },
     { text: "Software Engineer" },
-    { text: "Software Developer" }
+    { text: "Software Developer" },
   ];
 
   // Video configuration
-  const videos = useMemo(() => [
-    { src: "/videos/transitions/3.mp4", start: 1000, duration: 11000 }, // starts at 1 second
-    { src: "/videos/transitions/2.mp4", start: 0, duration: 10000 }, // starts at beginning
-    { src: "/videos/transitions/1.mp4", start: 0, duration: 8000 }, // starts at 2 seconds
-  ], []);
+  const videos = useMemo(
+    () => [
+      { src: "/videos/transitions/3.mp4", start: 1000, duration: 11000 }, // starts at 1 second
+      { src: "/videos/transitions/2.mp4", start: 0, duration: 10000 }, // starts at beginning
+      { src: "/videos/transitions/1.mp4", start: 0, duration: 8000 }, // starts at 2 seconds
+    ],
+    []
+  );
 
   const [roleIndex, setRoleIndex] = useState(0);
-  const [currentText, setCurrentText] = useState('');
+  const [currentText, setCurrentText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
-  
+
   const typingSpeed = 150; // milliseconds per character
   const deletingSpeed = 100; // milliseconds per character
   const delayBetweenRoles = 1500; // milliseconds
 
   // Video transition effect
   useEffect(() => {
-    console.log(`Current video index: ${currentVideoIndex}, playing: ${videos[currentVideoIndex].src}`);
-    
+    console.log(
+      `Current video index: ${currentVideoIndex}, playing: ${videos[currentVideoIndex].src}`
+    );
+
     const videoTimer = setTimeout(() => {
-      console.log(`Transitioning to next video after ${videos[currentVideoIndex].duration}ms`);
+      console.log(
+        `Transitioning to next video after ${videos[currentVideoIndex].duration}ms`
+      );
       setCurrentVideoIndex((prevIndex) => (prevIndex + 1) % videos.length);
     }, videos[currentVideoIndex].duration);
 
@@ -53,22 +60,24 @@ const HeroSection: React.FC = () => {
     }
   };
 
-  const handleVideoError = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+  const handleVideoError = (
+    e: React.SyntheticEvent<HTMLVideoElement, Event>
+  ) => {
     console.error(`Video error: ${videos[currentVideoIndex].src}`, e);
   };
 
   useEffect(() => {
     const handleTyping = () => {
       const fullText = roles[roleIndex].text;
-      setCurrentText(prevText => 
-        isDeleting 
+      setCurrentText((prevText) =>
+        isDeleting
           ? fullText.substring(0, prevText.length - 1)
           : fullText.substring(0, prevText.length + 1)
       );
 
       if (!isDeleting && currentText === fullText) {
         setTimeout(() => setIsDeleting(true), delayBetweenRoles);
-      } else if (isDeleting && currentText === '') {
+      } else if (isDeleting && currentText === "") {
         setIsDeleting(false);
         setRoleIndex((prevIndex) => (prevIndex + 1) % roles.length);
       }
@@ -84,25 +93,25 @@ const HeroSection: React.FC = () => {
 
   const fadeInUpVariants = {
     initial: { opacity: 0, y: 20 },
-    animate: { 
-      opacity: 1, 
+    animate: {
+      opacity: 1,
       y: 0,
-      transition: { duration: 0.6, ease: "easeOut" }
-    }
+      transition: { duration: 0.6, ease: "easeOut" },
+    },
   };
 
   const staggerContainer = {
     animate: {
       transition: {
-        staggerChildren: 0.2
-      }
-    }
+        staggerChildren: 0.2,
+      },
+    },
   };
 
   const videoVariants = {
     enter: { opacity: 0 },
     center: { opacity: 1 },
-    exit: { opacity: 0 }
+    exit: { opacity: 0 },
   };
 
   return (
@@ -113,7 +122,7 @@ const HeroSection: React.FC = () => {
         <div className="absolute top-4 left-4 z-50 bg-black/70 text-white px-3 py-1 rounded text-sm">
           {/* Video {currentVideoIndex + 1}/{videos.length}: {videos[currentVideoIndex].src.split('/').pop()} */}
         </div>
-        
+
         <AnimatePresence mode="wait">
           <motion.video
             key={currentVideoIndex}
@@ -122,12 +131,12 @@ const HeroSection: React.FC = () => {
             playsInline
             className="absolute min-w-full min-h-full object-cover"
             style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: '100%',
-              height: '100%',
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "100%",
+              height: "100%",
             }}
             variants={videoVariants}
             initial="enter"
@@ -143,15 +152,15 @@ const HeroSection: React.FC = () => {
             Your browser does not support the video tag.
           </motion.video>
         </AnimatePresence>
-        
+
         {/* tinted overlay */}
         <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
-        
+
         {/*  gradient overlay for better contrast */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30" />
       </div>
 
-      <motion.div 
+      <motion.div
         className="max-w-7xl mx-auto w-full relative z-20"
         variants={staggerContainer}
         initial="initial"
@@ -159,7 +168,7 @@ const HeroSection: React.FC = () => {
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Side - Profile Card */}
-          <motion.div 
+          <motion.div
             className="glass-card rounded-2xl p-6 relative overflow-hidden lg:max-w-md mx-auto w-full flex flex-col items-center shadow-lg backdrop-blur-md"
             variants={fadeInUpVariants}
           >
@@ -184,9 +193,11 @@ const HeroSection: React.FC = () => {
                 />
               </div>
             </div>
-            
+
             {/* Profile Info */}
-            <div className="text-2xl font-bold text-center mb-1 pt-[80px]">Do Phu Trong</div>
+            <div className="text-2xl font-bold text-center mb-1 pt-[80px]">
+              Do Phu Trong
+            </div>
             <div className="text-lg text-primary flex items-center space-x-2 mb-4">
               <Briefcase className="w-5 h-5 text-blue-400" />
               {/* <span>Software Engineer</span> */}
@@ -204,7 +215,7 @@ const HeroSection: React.FC = () => {
           {/* */}
           <div className="text-center lg:text-left">
             {/* Name and Title (from original HeroSection) */}
-            <motion.h1 
+            <motion.h1
               className="text-5xl md:text-7xl font-bold mb-4 glow-text"
               variants={fadeInUpVariants}
               whileHover={{ scale: 1.02 }}
@@ -212,33 +223,44 @@ const HeroSection: React.FC = () => {
             >
               {/* Do Phu Trong */}
             </motion.h1>
-            <motion.h2 
+            <motion.h2
               className="text-2xl md:text-3xl font-bold mb-6"
               variants={fadeInUpVariants}
             >
-              <GradientText>
-                I am a {currentText}
-              </GradientText>
+              <GradientText>I am a {currentText}</GradientText>
             </motion.h2>
-            
+
             {/* Description (from original HeroSection) */}
-            <motion.p 
+            <motion.p
               className="text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 mb-8 leading-relaxed "
               variants={fadeInUpVariants}
             >
-              Engineering resilient and scalable digital ecosystems, driven by a performance-first mindset, robust security principles,
-              and a commitment to elegant, maintainable architecture.
+              Software developer focused on building scalable backend systems
+              and APIs. Passionate about database optimization, security, and
+              cloud deployment solutions.
             </motion.p>
 
             {/* Social Links (from original HeroSection) */}
-            <motion.div 
+            <motion.div
               className="flex justify-center lg:justify-start space-x-4 mb-8"
               variants={fadeInUpVariants}
             >
               {[
-                { icon: Github, href: 'https://github.com/y0shih', label: 'GitHub Profile' },
-                { icon: Linkedin, href: 'https://linkedin.com/in/', label: 'LinkedIn Profile' },
-                { icon: Mail, href: 'mailto:trongh1337@gmail.com', label: 'Email' }
+                {
+                  icon: Github,
+                  href: "https://github.com/y0shih",
+                  label: "GitHub Profile",
+                },
+                {
+                  icon: Linkedin,
+                  href: "https://linkedin.com/in/",
+                  label: "LinkedIn Profile",
+                },
+                {
+                  icon: Mail,
+                  href: "mailto:trongh1337@gmail.com",
+                  label: "Email",
+                },
               ].map((social) => (
                 <motion.a
                   key={social.label}
@@ -247,9 +269,9 @@ const HeroSection: React.FC = () => {
                   rel="noopener noreferrer"
                   className="glass-card glass-hover rounded-xl p-3"
                   aria-label={social.label}
-                  whileHover={{ 
+                  whileHover={{
                     scale: 1.1,
-                    transition: { duration: 0.1 }
+                    transition: { duration: 0.1 },
                   }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -261,7 +283,7 @@ const HeroSection: React.FC = () => {
         </div>
       </motion.div>
     </section>
-  )
-}
+  );
+};
 
-export default HeroSection 
+export default HeroSection;

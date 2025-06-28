@@ -32,8 +32,34 @@ const Navigation: React.FC = () => {
       })
     }
 
+    // Handle initial hash navigation
+    const handleHashNavigation = () => {
+      const hash = window.location.hash.substring(1) // Remove the '#'
+      if (hash) {
+        const element = document.getElementById(hash)
+        if (element) {
+          setTimeout(() => {
+            element.scrollIntoView({ 
+              behavior: 'smooth',
+              block: 'start'
+            })
+            setActiveSection(hash)
+          }, 100) // Small delay to ensure page is loaded
+        }
+      }
+    }
+
+    // Handle hash navigation on page load
+    handleHashNavigation()
+    
+    // Handle hash changes
+    window.addEventListener('hashchange', handleHashNavigation)
     window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('hashchange', handleHashNavigation)
+    }
   }, [])
 
   const scrollToSection = (sectionId: string) => {
@@ -43,6 +69,8 @@ const Navigation: React.FC = () => {
         behavior: 'smooth',
         block: 'start'
       })
+      // Update URL hash without triggering a page reload
+      window.history.pushState(null, '', `#${sectionId}`)
     }
   }
 

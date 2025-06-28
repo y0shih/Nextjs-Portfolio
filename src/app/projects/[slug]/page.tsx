@@ -17,11 +17,11 @@ const ProjectDetail = () => {
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4">Project Not Found</h1>
           <Link 
-            href="/"
+            href="/#projects"
             className="glass-card glass-hover rounded-lg px-6 py-3 text-foreground font-semibold inline-flex items-center space-x-2"
           >
             <ArrowLeft className="w-5 h-5" />
-            <span>Back to Home</span>
+            <span>Back to Projects</span>
           </Link>
         </div>
       </div>
@@ -35,7 +35,7 @@ const ProjectDetail = () => {
       <div className="max-w-6xl mx-auto">
         {/* Back Button */}
         <Link 
-          href="/"
+          href="/#projects"
           className="glass-card glass-hover rounded-lg px-4 py-2 text-foreground font-semibold inline-flex items-center space-x-2 mb-8"
         >
           <ArrowLeft className="w-5 h-5" />

@@ -85,10 +85,10 @@ export const projects: Project[] = [
     technologies: ["Ionic React", "TypeScript", "Nodejs", "Firebase"],
     githubUrlFE: "https://github.com/y0shih/WyA_Frontend",
     githubUrlBE: "https://github.com/y0shih/WyA_Backend",
-    liveUrl: "https://wy-a-introduction.vercel.app/",
+    liveUrl: "https://wya-tau.vercel.app/",
     type: "mobile",
-    slug: "wya-chat",
-    featuredImage: "/projects/wya-chat/featured.jpg",
+    slug: "wya",
+    featuredImage: "/projects/wya/wya.png",
     details: `WyA is an innovative location-based chat application that connects users in real-time based on their geographical proximity.
     The platform combines modern web technologies with real-time communication features.
     
@@ -112,7 +112,6 @@ export const projects: Project[] = [
       "/projects/wya-chat/gallery-2.jpg",
       "/projects/wya-chat/gallery-3.jpg"
     ],
-    demoVideo: "https://www.youtube.com/embed/your-video-id"
   },
   {
     title: "Portfolio Website",
