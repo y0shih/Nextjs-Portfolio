@@ -39,57 +39,88 @@ const HeroSection: React.FC = () => {
   const deletingSpeed = 100; // milliseconds per character
   const delayBetweenRoles = 1500; // milliseconds
 
-  // Preload all videos on component mount
+  // Enhanced video loading with timeout and fallback
   useEffect(() => {
     const preloadVideos = async () => {
       const loadPromises = videos.map((video, index) => {
-        return new Promise<void>((resolve, reject) => {
+        return new Promise<void>((resolve) => {
           const videoElement = document.createElement('video');
           videoElement.preload = 'metadata';
           videoElement.muted = true;
           videoElement.playsInline = true;
           
+          let hasResolved = false;
+          
+          const resolveOnce = () => {
+            if (!hasResolved) {
+              hasResolved = true;
+              videoCache.current[index] = videoElement;
+              setVideosLoaded(prev => {
+                const updated = [...prev];
+                updated[index] = true;
+                return updated;
+              });
+              videoElement.removeEventListener('canplaythrough', handleCanPlay);
+              videoElement.removeEventListener('loadedmetadata', handleMetadata);
+              videoElement.removeEventListener('error', handleError);
+              resolve();
+            }
+          };
+          
           const handleCanPlay = () => {
-            videoCache.current[index] = videoElement;
-            setVideosLoaded(prev => {
-              const updated = [...prev];
-              updated[index] = true;
-              return updated;
-            });
-            videoElement.removeEventListener('canplaythrough', handleCanPlay);
-            videoElement.removeEventListener('error', handleError);
-            resolve();
+            console.log(`Video ${index} can play through:`, video.src);
+            resolveOnce();
+          };
+          
+          const handleMetadata = () => {
+            console.log(`Video ${index} metadata loaded:`, video.src);
+            resolveOnce();
           };
           
           const handleError = (e: Event) => {
             console.warn(`Failed to preload video ${index}:`, video.src, e);
-            videoElement.removeEventListener('canplaythrough', handleCanPlay);
-            videoElement.removeEventListener('error', handleError);
-            reject(e);
+            resolveOnce(); // Still resolve to prevent hanging
           };
           
-          videoElement.addEventListener('canplaythrough', handleCanPlay);
-          videoElement.addEventListener('error', handleError);
-          videoElement.src = video.src;
+          // Timeout fallback - don't wait forever
+          const timeout = setTimeout(() => {
+            console.warn(`Video ${index} loading timeout, continuing anyway:`, video.src);
+            resolveOnce();
+          }, 10000); // 10 second timeout
           
-          // Set start time if specified
-          if (video.start > 0) {
-            videoElement.currentTime = video.start / 1000;
+          videoElement.addEventListener('canplaythrough', handleCanPlay);
+          videoElement.addEventListener('loadedmetadata', handleMetadata);
+          videoElement.addEventListener('error', handleError);
+          
+          try {
+            videoElement.src = video.src;
+            
+            // Set start time if specified
+            if (video.start > 0) {
+              videoElement.currentTime = video.start / 1000;
+            }
+          } catch (error) {
+            console.error(`Error setting video src for ${index}:`, error);
+            clearTimeout(timeout);
+            resolveOnce();
           }
         });
       });
 
       try {
+        console.log('Starting video preload...');
         await Promise.allSettled(loadPromises);
         setAllVideosPreloaded(true);
-        console.log('All videos preloaded successfully');
+        console.log('Video preload completed');
       } catch (error) {
-        console.warn('Some videos failed to preload:', error);
+        console.warn('Video preload failed:', error);
         setAllVideosPreloaded(true); // Continue anyway
       }
     };
 
-    preloadVideos();
+    // Add a small delay to ensure DOM is ready
+    const timer = setTimeout(preloadVideos, 100);
+    return () => clearTimeout(timer);
   }, [videos]);
 
   // Video transition effect - only start after preloading
