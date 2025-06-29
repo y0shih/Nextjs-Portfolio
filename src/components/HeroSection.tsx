@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import Image from "next/image";
 import { Briefcase, Mail, MapPin, Github, Linkedin } from "lucide-react";
 import profileImage from "../assets/images/profile.png";
@@ -9,12 +9,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import GradientText from "./ui/GradientText";
 
 const HeroSection: React.FC = () => {
-  const roles = [
+  const roles = useMemo(() => [
     { text: "Web Developer" },
     { text: "Data Analyst" },
     { text: "Software Engineer" },
     { text: "Software Developer" },
-  ];
+  ], []);
 
   // Video configuration
   const videos = useMemo(
@@ -30,14 +30,72 @@ const HeroSection: React.FC = () => {
   const [currentText, setCurrentText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  const [, setVideosLoaded] = useState<boolean[]>(new Array(videos.length).fill(false));
+  const [allVideosPreloaded, setAllVideosPreloaded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const videoCache = useRef<HTMLVideoElement[]>([]);
 
   const typingSpeed = 150; // milliseconds per character
   const deletingSpeed = 100; // milliseconds per character
   const delayBetweenRoles = 1500; // milliseconds
 
-  // Video transition effect
+  // Preload all videos on component mount
   useEffect(() => {
+    const preloadVideos = async () => {
+      const loadPromises = videos.map((video, index) => {
+        return new Promise<void>((resolve, reject) => {
+          const videoElement = document.createElement('video');
+          videoElement.preload = 'metadata';
+          videoElement.muted = true;
+          videoElement.playsInline = true;
+          
+          const handleCanPlay = () => {
+            videoCache.current[index] = videoElement;
+            setVideosLoaded(prev => {
+              const updated = [...prev];
+              updated[index] = true;
+              return updated;
+            });
+            videoElement.removeEventListener('canplaythrough', handleCanPlay);
+            videoElement.removeEventListener('error', handleError);
+            resolve();
+          };
+          
+          const handleError = (e: Event) => {
+            console.warn(`Failed to preload video ${index}:`, video.src, e);
+            videoElement.removeEventListener('canplaythrough', handleCanPlay);
+            videoElement.removeEventListener('error', handleError);
+            reject(e);
+          };
+          
+          videoElement.addEventListener('canplaythrough', handleCanPlay);
+          videoElement.addEventListener('error', handleError);
+          videoElement.src = video.src;
+          
+          // Set start time if specified
+          if (video.start > 0) {
+            videoElement.currentTime = video.start / 1000;
+          }
+        });
+      });
+
+      try {
+        await Promise.allSettled(loadPromises);
+        setAllVideosPreloaded(true);
+        console.log('All videos preloaded successfully');
+      } catch (error) {
+        console.warn('Some videos failed to preload:', error);
+        setAllVideosPreloaded(true); // Continue anyway
+      }
+    };
+
+    preloadVideos();
+  }, [videos]);
+
+  // Video transition effect - only start after preloading
+  useEffect(() => {
+    if (!allVideosPreloaded) return;
+
     console.log(
       `Current video index: ${currentVideoIndex}, playing: ${videos[currentVideoIndex].src}`
     );
@@ -50,21 +108,25 @@ const HeroSection: React.FC = () => {
     }, videos[currentVideoIndex].duration);
 
     return () => clearTimeout(videoTimer);
-  }, [currentVideoIndex, videos]);
+  }, [currentVideoIndex, videos, allVideosPreloaded]);
 
-  const handleVideoLoad = () => {
+  const handleVideoLoad = useCallback(() => {
     console.log(`Video loaded: ${videos[currentVideoIndex].src}`);
     // Set the start time when video loads
-    if (videoRef.current && videos[currentVideoIndex].start) {
+    if (videoRef.current && videos[currentVideoIndex].start > 0) {
       videoRef.current.currentTime = videos[currentVideoIndex].start / 1000; // Convert ms to seconds
     }
-  };
+  }, [currentVideoIndex, videos]);
 
-  const handleVideoError = (
+  const handleVideoError = useCallback((
     e: React.SyntheticEvent<HTMLVideoElement, Event>
   ) => {
     console.error(`Video error: ${videos[currentVideoIndex].src}`, e);
-  };
+    // Try to continue with the next video if current one fails
+    setTimeout(() => {
+      setCurrentVideoIndex((prevIndex) => (prevIndex + 1) % videos.length);
+    }, 1000);
+  }, [currentVideoIndex, videos]);
 
   useEffect(() => {
     const handleTyping = () => {
@@ -118,40 +180,48 @@ const HeroSection: React.FC = () => {
     <section className="h-screen w-full relative flex items-center justify-center px-6 snap-start">
       {/* Video Background */}
       <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
+        {/* Loading indicator */}
+        {!allVideosPreloaded && (
+          <div className="absolute inset-0 flex items-center justify-center z-50 bg-black/50">
+            <div className="text-white text-lg">Loading videos...</div>
+          </div>
+        )}
+
         {/* Debug info - remove in production */}
         <div className="absolute top-4 left-4 z-50 bg-black/70 text-white px-3 py-1 rounded text-sm">
           {/* Video {currentVideoIndex + 1}/{videos.length}: {videos[currentVideoIndex].src.split('/').pop()} */}
         </div>
 
-        <AnimatePresence mode="wait">
-          <motion.video
-            key={currentVideoIndex}
-            autoPlay
-            muted
-            playsInline
-            className="absolute min-w-full min-h-full object-cover"
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: "100%",
-              height: "100%",
-            }}
-            variants={videoVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-            onLoad={handleVideoLoad}
-            onError={handleVideoError}
-            onLoadedData={handleVideoLoad}
-            ref={videoRef}
-          >
-            <source src={videos[currentVideoIndex].src} type="video/mp4" />
-            Your browser does not support the video tag.
-          </motion.video>
-        </AnimatePresence>
+        {allVideosPreloaded && (
+          <AnimatePresence mode="wait">
+            <motion.video
+              key={currentVideoIndex}
+              autoPlay
+              muted
+              playsInline
+              className="absolute min-w-full min-h-full object-cover"
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: "100%",
+                height: "100%",
+              }}
+              variants={videoVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+              onLoadedData={handleVideoLoad}
+              onError={handleVideoError}
+              ref={videoRef}
+            >
+              <source src={videos[currentVideoIndex].src} type="video/mp4" />
+              Your browser does not support the video tag.
+            </motion.video>
+          </AnimatePresence>
+        )}
 
         {/* tinted overlay */}
         <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
