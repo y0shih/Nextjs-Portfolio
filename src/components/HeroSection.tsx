@@ -30,8 +30,9 @@ const HeroSection: React.FC = () => {
   const [currentText, setCurrentText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
-  const [, setVideosLoaded] = useState<boolean[]>(new Array(videos.length).fill(false));
+  const [videosLoaded, setVideosLoaded] = useState<boolean[]>(new Array(videos.length).fill(false));
   const [allVideosPreloaded, setAllVideosPreloaded] = useState(false);
+  const [hasVideoError, setHasVideoError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const videoCache = useRef<HTMLVideoElement[]>([]);
 
@@ -39,88 +40,118 @@ const HeroSection: React.FC = () => {
   const deletingSpeed = 100; // milliseconds per character
   const delayBetweenRoles = 1500; // milliseconds
 
-  // Enhanced video loading with timeout and fallback
+  // Progressive video loading - start with first video, load others in background
   useEffect(() => {
-    const preloadVideos = async () => {
-      const loadPromises = videos.map((video, index) => {
-        return new Promise<void>((resolve) => {
-          const videoElement = document.createElement('video');
-          videoElement.preload = 'metadata';
-          videoElement.muted = true;
-          videoElement.playsInline = true;
+    const loadFirstVideo = async () => {
+      // Load the first video immediately
+      try {
+        const firstVideo = document.createElement('video');
+        firstVideo.preload = 'metadata';
+        firstVideo.muted = true;
+        firstVideo.playsInline = true;
+        
+        const loadPromise = new Promise<void>((resolve) => {
+          const timeout = setTimeout(() => {
+            console.warn('First video loading timeout, proceeding anyway');
+            resolve();
+          }, 5000); // Shorter timeout for first video
           
-          let hasResolved = false;
-          
-          const resolveOnce = () => {
-            if (!hasResolved) {
-              hasResolved = true;
-              videoCache.current[index] = videoElement;
-              setVideosLoaded(prev => {
-                const updated = [...prev];
-                updated[index] = true;
-                return updated;
-              });
-              videoElement.removeEventListener('canplaythrough', handleCanPlay);
-              videoElement.removeEventListener('loadedmetadata', handleMetadata);
-              videoElement.removeEventListener('error', handleError);
-              resolve();
-            }
-          };
-          
-          const handleCanPlay = () => {
-            console.log(`Video ${index} can play through:`, video.src);
-            resolveOnce();
-          };
-          
-          const handleMetadata = () => {
-            console.log(`Video ${index} metadata loaded:`, video.src);
-            resolveOnce();
+          const handleReady = () => {
+            clearTimeout(timeout);
+            videoCache.current[0] = firstVideo;
+            setVideosLoaded(prev => {
+              const updated = [...prev];
+              updated[0] = true;
+              return updated;
+            });
+            console.log('First video ready:', videos[0].src);
+            resolve();
           };
           
           const handleError = (e: Event) => {
-            console.warn(`Failed to preload video ${index}:`, video.src, e);
-            resolveOnce(); // Still resolve to prevent hanging
+            clearTimeout(timeout);
+            console.warn('First video failed to load:', videos[0].src, e);
+            setHasVideoError(true);
+            resolve(); // Continue anyway
           };
           
-          // Timeout fallback - don't wait forever
-          const timeout = setTimeout(() => {
-            console.warn(`Video ${index} loading timeout, continuing anyway:`, video.src);
-            resolveOnce();
-          }, 10000); // 10 second timeout
-          
-          videoElement.addEventListener('canplaythrough', handleCanPlay);
-          videoElement.addEventListener('loadedmetadata', handleMetadata);
-          videoElement.addEventListener('error', handleError);
-          
-          try {
-            videoElement.src = video.src;
-            
-            // Set start time if specified
-            if (video.start > 0) {
-              videoElement.currentTime = video.start / 1000;
-            }
-          } catch (error) {
-            console.error(`Error setting video src for ${index}:`, error);
-            clearTimeout(timeout);
-            resolveOnce();
-          }
+          firstVideo.addEventListener('loadedmetadata', handleReady);
+          firstVideo.addEventListener('error', handleError);
         });
-      });
-
-      try {
-        console.log('Starting video preload...');
-        await Promise.allSettled(loadPromises);
-        setAllVideosPreloaded(true);
-        console.log('Video preload completed');
+        
+        firstVideo.src = videos[0].src;
+        if (videos[0].start > 0) {
+          firstVideo.currentTime = videos[0].start / 1000;
+        }
+        
+        await loadPromise;
+        setAllVideosPreloaded(true); // Allow UI to start immediately
+        
       } catch (error) {
-        console.warn('Video preload failed:', error);
+        console.warn('Failed to load first video:', error);
         setAllVideosPreloaded(true); // Continue anyway
       }
     };
 
-    // Add a small delay to ensure DOM is ready
-    const timer = setTimeout(preloadVideos, 100);
-    return () => clearTimeout(timer);
+    // Load remaining videos in background (don't block UI)
+    const loadRemainingVideos = async () => {
+      for (let i = 1; i < videos.length; i++) {
+        try {
+          const video = document.createElement('video');
+          video.preload = 'metadata';
+          video.muted = true;
+          video.playsInline = true;
+          
+          const loadPromise = new Promise<void>((resolve) => {
+            const timeout = setTimeout(() => {
+              console.warn(`Background video ${i} timeout:`, videos[i].src);
+              resolve();
+            }, 15000); // Longer timeout for background loading
+            
+            const handleReady = () => {
+              clearTimeout(timeout);
+              videoCache.current[i] = video;
+              setVideosLoaded(prev => {
+                const updated = [...prev];
+                updated[i] = true;
+                return updated;
+              });
+              console.log(`Background video ${i} ready:`, videos[i].src);
+              resolve();
+            };
+            
+            const handleError = () => {
+              clearTimeout(timeout);
+              console.warn(`Background video ${i} failed:`, videos[i].src);
+              resolve();
+            };
+            
+            video.addEventListener('loadedmetadata', handleReady);
+            video.addEventListener('error', handleError);
+          });
+          
+          video.src = videos[i].src;
+          if (videos[i].start > 0) {
+            video.currentTime = videos[i].start / 1000;
+          }
+          
+          await loadPromise;
+          
+          // Add delay between background loads to not overwhelm the connection
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+        } catch (error) {
+          console.warn(`Failed to load background video ${i}:`, error);
+        }
+      }
+      console.log('All background videos processed');
+    };
+
+    // Start loading first video immediately
+    loadFirstVideo();
+    
+    // Start background loading after a delay
+    setTimeout(loadRemainingVideos, 2000);
   }, [videos]);
 
   // Video transition effect - only start after preloading
@@ -214,7 +245,6 @@ const HeroSection: React.FC = () => {
         {/* Loading indicator */}
         {!allVideosPreloaded && (
           <div className="absolute inset-0 flex items-center justify-center z-50 bg-black/50">
-            <div className="text-white text-lg">Loading videos...</div>
           </div>
         )}
 
@@ -223,7 +253,8 @@ const HeroSection: React.FC = () => {
           {/* Video {currentVideoIndex + 1}/{videos.length}: {videos[currentVideoIndex].src.split('/').pop()} */}
         </div>
 
-        {allVideosPreloaded && (
+        {/* Video player or static fallback */}
+        {allVideosPreloaded && !hasVideoError && videosLoaded[currentVideoIndex] && (
           <AnimatePresence mode="wait">
             <motion.video
               key={currentVideoIndex}
@@ -252,6 +283,16 @@ const HeroSection: React.FC = () => {
               Your browser does not support the video tag.
             </motion.video>
           </AnimatePresence>
+        )}
+        
+        {/* Static background fallback when videos fail */}
+        {(hasVideoError || (allVideosPreloaded && !videosLoaded[currentVideoIndex])) && (
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-br from-blue-900 via-purple-900 to-slate-900"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          />
         )}
 
         {/* tinted overlay */}
