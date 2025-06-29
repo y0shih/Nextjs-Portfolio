@@ -19,8 +19,8 @@ const HeroSection: React.FC = () => {
   // Video configuration
   const videos = useMemo(
     () => [
-      { src: "/videos/transitions/3.mp4", start: 1000, duration: 11000 }, // starts at 1 second
-      { src: "/videos/transitions/2.mp4", start: 0, duration: 10000 }, // starts at beginning
+      { src: "/videos/transitions/2.mp4", start: 0, duration: 11000 }, // starts at 1 second
+      { src: "/videos/transitions/3.mp4", start: 0, duration: 10000 }, // starts at beginning
       { src: "/videos/transitions/1.mp4", start: 0, duration: 8000 }, // starts at 2 seconds
     ],
     []
@@ -30,9 +30,9 @@ const HeroSection: React.FC = () => {
   const [currentText, setCurrentText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
-  const [videosLoaded, setVideosLoaded] = useState<boolean[]>(new Array(videos.length).fill(false));
+  const [, setVideosLoaded] = useState<boolean[]>(new Array(videos.length).fill(false));
+  const [firstVideoLoaded, setFirstVideoLoaded] = useState(false);
   const [allVideosPreloaded, setAllVideosPreloaded] = useState(false);
-  const [hasVideoError, setHasVideoError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const videoCache = useRef<HTMLVideoElement[]>([]);
 
@@ -65,14 +65,14 @@ const HeroSection: React.FC = () => {
               return updated;
             });
             console.log('First video ready:', videos[0].src);
+            setFirstVideoLoaded(true);
             resolve();
           };
           
           const handleError = (e: Event) => {
             clearTimeout(timeout);
             console.warn('First video failed to load:', videos[0].src, e);
-            setHasVideoError(true);
-            resolve(); // Continue anyway
+            resolve(); // Continue without video
           };
           
           firstVideo.addEventListener('loadedmetadata', handleReady);
@@ -242,9 +242,10 @@ const HeroSection: React.FC = () => {
     <section className="h-screen w-full relative flex items-center justify-center px-6 snap-start">
       {/* Video Background */}
       <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
-        {/* Loading indicator */}
-        {!allVideosPreloaded && (
-          <div className="absolute inset-0 flex items-center justify-center z-50 bg-black/50">
+        {/* Loading indicator - only show before first video loads */}
+        {!firstVideoLoaded && (
+          <div className="absolute inset-0 flex items-center justify-center z-50 bg-black/90">
+            <div className="text-white text-lg">Loading video...</div>
           </div>
         )}
 
@@ -253,8 +254,8 @@ const HeroSection: React.FC = () => {
           {/* Video {currentVideoIndex + 1}/{videos.length}: {videos[currentVideoIndex].src.split('/').pop()} */}
         </div>
 
-        {/* Video player or static fallback */}
-        {allVideosPreloaded && !hasVideoError && videosLoaded[currentVideoIndex] && (
+        {/* Video player - show once first video is ready */}
+        {firstVideoLoaded && (
           <AnimatePresence mode="wait">
             <motion.video
               key={currentVideoIndex}
@@ -283,16 +284,6 @@ const HeroSection: React.FC = () => {
               Your browser does not support the video tag.
             </motion.video>
           </AnimatePresence>
-        )}
-        
-        {/* Static background fallback when videos fail */}
-        {(hasVideoError || (allVideosPreloaded && !videosLoaded[currentVideoIndex])) && (
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-br from-blue-900 via-purple-900 to-slate-900"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          />
         )}
 
         {/* tinted overlay */}
