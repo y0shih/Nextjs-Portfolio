@@ -3,7 +3,7 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { OrbitControls, Html } from "@react-three/drei"
 import { useRef, useMemo, useState } from "react"
-import { Vector3, BufferGeometry, Float32BufferAttribute } from "three"
+import { Vector3 } from "three"
 import type * as THREE from "three"
 import Image from "next/image"
 
@@ -37,30 +37,7 @@ function fibonacciSphere(samples: number, radius = 5) {
   return points
 }
 
-function ConnectionLines({ positions }: { positions: Vector3[] }) {
-  const geometry = useMemo(() => {
-    const geo = new BufferGeometry()
-    const vertices = []
 
-    for (let i = 0; i < positions.length; i++) {
-      for (let j = i + 1; j < positions.length; j++) {
-        const distance = positions[i].distanceTo(positions[j])
-        if (distance < 5.5) {
-          vertices.push(positions[i].x, positions[i].y, positions[i].z, positions[j].x, positions[j].y, positions[j].z)
-        }
-      }
-    }
-
-    geo.setAttribute("position", new Float32BufferAttribute(vertices, 3))
-    return geo
-  }, [positions])
-
-  return (
-    <lineSegments geometry={geometry}>
-      <lineBasicMaterial color="#ffffff" transparent opacity={0.8} />
-    </lineSegments>
-  )
-}
 
 function TechIcon({
   position,
@@ -102,8 +79,8 @@ function TechIcon({
       <Html center distanceFactor={6} position={[0, 0, 0.01]} style={{ pointerEvents: "none", userSelect: "none" }}>
         <div
           style={{
-            width: "50px",
-            height: "50px",
+            width: "90px",
+            height: "90px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -117,9 +94,8 @@ function TechIcon({
           <Image 
             src={tech.icon || "/placeholder.svg"} 
             alt={tech.name} 
-            width={36} 
-            height={36}
-            unoptimized
+            width={80} 
+            height={80}
           />
         </div>
       </Html>
@@ -154,7 +130,11 @@ function TechGlobe() {
 
   return (
     <>
-      <ConnectionLines positions={iconPositions} />
+      <Html center position={[0, 0, 0]}>
+        <div style={{ color: "#ffffff", fontSize: "14px", fontWeight: "bold", pointerEvents: "none" }}>
+          drag me :)
+        </div>
+      </Html>
       <group ref={groupRef}>
         {techStacks.map((tech, index) => (
           <TechIcon

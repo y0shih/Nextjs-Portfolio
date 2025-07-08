@@ -10,24 +10,24 @@ const AboutSection: React.FC = () => {
   const skills = [
     {
       icon: Code,
-      title: "Frontend Developer",
+      title: "Frontend",
       description:
         "React, TypeScript, modern UI design, responsive and scalable interfaces.",
     },
     {
       icon: Code,
-      title: "Backend Developer",
+      title: "Backend",
       description: "Node.js, Nest.js, Python, REST APIs, authentication and backend architecture.",
     },
     {
       icon: Database,
-      title: "Database Engineer",
+      title: "Database",
       description: "SQL & NoSQL, schema design, performance tuning.",
     },
     {
       icon: Rocket,
       title: "DevOps",
-      description: "CI/CD, build optimization, automation scripts, deployment.",
+      description: "CI/CD, build optimization, scripting, deployment.",
     },
   ];
 

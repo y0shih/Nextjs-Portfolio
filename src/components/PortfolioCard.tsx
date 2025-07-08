@@ -27,7 +27,7 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({
     >
       <div className="flex items-center mb-4">
         <div className="glass-card rounded-xl p-3 mr-4">
-          <Icon className="w-6 h-6 text-primary" />
+          <Icon className="w-4 h-4 text-primary" />
         </div>
         <h3 className="text-xl font-semibold text-foreground transition-all duration-300 group-hover:text-blue-400 group-hover:glow-text">{title}</h3>
       </div>
