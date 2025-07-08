@@ -1,9 +1,10 @@
 "use client";
 import React from "react";
-import { Code, Database, Rocket, Users } from "lucide-react";
+import { Code, Database, Rocket } from "lucide-react";
 
 import { motion } from "framer-motion";
 import PortfolioCard from "./PortfolioCard";
+import TechGlobe from "./ui/tech-globe";
 
 const AboutSection: React.FC = () => {
   const skills = [
@@ -25,7 +26,7 @@ const AboutSection: React.FC = () => {
     },
     {
       icon: Rocket,
-      title: "DevOps / Scripting",
+      title: "DevOps",
       description: "CI/CD, build optimization, automation scripts, deployment.",
     },
   ];
@@ -75,51 +76,65 @@ const AboutSection: React.FC = () => {
         viewport={{ once: true, margin: "-100px" }}
         variants={containerVariants}
       >
-        {/* Section Header */}
-        <motion.div className="text-center mb-8" variants={itemVariants}>
-          <motion.h2
-            className="text-3xl md:text-4xl font-bold mb-4 glow-text"
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.2 }}
-          >
-            About Me
-          </motion.h2>
-          <motion.p
-            className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed"
-            variants={itemVariants}
-          >
-            I&apos;m a backend-focused developer with a background in data
-            analysis. I specialize in building efficient APIs, managing
-            databases and optimizing application performance. My passion lies in
-            creating scalable solutions that enhance user experiences and drive
-            business success.
-          </motion.p>
-        </motion.div>
-
-        {/* Skills Grid */}
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-          variants={containerVariants}
-        >
-          {skills.map((skill, index) => (
-            <motion.div
-              key={skill.title}
-              variants={itemVariants}
-              whileHover={{
-                scale: 1.02,
-                transition: { duration: 0.2 },
-              }}
-            >
-              <PortfolioCard
-                icon={skill.icon}
-                title={skill.title}
-                description={skill.description}
-                delay={index * 150}
-                className="bg-black/30 backdrop-blur-sm"
-              />
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          {/* Left Column - Text Content */}
+          <motion.div className="space-y-8" variants={itemVariants}>
+            {/* Section Header */}
+            <motion.div className="text-left" variants={itemVariants}>
+              <motion.h2
+                className="text-3xl md:text-4xl font-bold mb-4 glow-text"
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.2 }}
+              >
+                About Me
+              </motion.h2>
+              <motion.p
+                className="text-lg text-muted-foreground leading-relaxed"
+                variants={itemVariants}
+              >
+                I&apos;m a 4th year student in Nong Lam University with a background in data
+                analysis. I specialize in developing Backend system building efficient APIs, managing
+                databases and optimizing application performance.
+              </motion.p>
             </motion.div>
-          ))}
-        </motion.div>
+
+            {/* Skills Grid */}
+            <motion.div
+              className="grid grid-cols-1 md:grid-cols-2 gap-4"
+              variants={containerVariants}
+            >
+              {skills.map((skill, index) => (
+                <motion.div
+                  key={skill.title}
+                  variants={itemVariants}
+                  whileHover={{
+                    scale: 1.02,
+                    transition: { duration: 0.2 },
+                  }}
+                >
+                  <PortfolioCard
+                    icon={skill.icon}
+                    title={skill.title}
+                    description={skill.description}
+                    delay={index * 150}
+                    className="bg-black/30 backdrop-blur-sm"
+                  />
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
+
+          {/* Right Column - Tech Globe */}
+          <motion.div 
+            className="h-[500px] w-full"
+            variants={itemVariants}
+            whileHover={{ scale: 1.02 }}
+            transition={{ duration: 0.3 }}
+          >
+            <TechGlobe />
+          </motion.div>
+        </div>
 
         {/* Experience Stats */}
         {/* <motion.div 

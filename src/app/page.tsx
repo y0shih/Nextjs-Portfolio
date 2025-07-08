@@ -5,7 +5,6 @@ import AboutSection from "@/components/AboutSection"
 import ContactSection from "@/components/ContactSection"
 import MusicPlayer from "@/components/MusicPlayer"
 import ProjectsSection from "@/components/ProjectsSection"
-import TechnicalExpertiseSection from "@/components/TechnicalExpertiseSection"
 import Navigation from "@/components/Navigation"
 
 export default function Home() {
@@ -17,9 +16,6 @@ export default function Home() {
       </section>
       <section id="about" className="snap-section">
         <AboutSection />
-      </section>
-      <section id="expertise" className="snap-section">
-        <TechnicalExpertiseSection />
       </section>
       <section id="projects" className="snap-section">
         <ProjectsSection />
