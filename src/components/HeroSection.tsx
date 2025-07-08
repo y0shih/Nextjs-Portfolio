@@ -19,7 +19,6 @@ const HeroSection: React.FC = () => {
     () => [
       { src: "/videos/transitions/2.mp4", start: 0, duration: 11000 },
       { src: "/videos/transitions/3.mp4", start: 0, duration: 10000 },
-      { src: "/videos/transitions/1.mp4", start: 0, duration: 8000 },
     ],
     []
   );
@@ -228,9 +227,8 @@ const HeroSection: React.FC = () => {
               <Image
                 src="/profile/house.png"
                 alt="Background Profile Banner"
-                layout="fill"
-                objectFit="cover"
-                className="rounded-t-2xl"
+                fill
+                className="rounded-t-2xl object-cover"
               />
               {/* Profile Image - positioned to overlap */}
               <div className="absolute z-10 w-40 h-40 rounded-full overflow-hidden border-4 border-transparent bg-transparent shadow-md left-1/2 -translate-x-1/2 bottom-[-80px]">

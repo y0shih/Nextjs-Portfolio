@@ -4,7 +4,6 @@ import HeroSection from "@/components/HeroSection"
 import AboutSection from "@/components/AboutSection"
 import ContactSection from "@/components/ContactSection"
 import MusicPlayer from "@/components/MusicPlayer"
-import Time from "@/components/Time"
 import ProjectsSection from "@/components/ProjectsSection"
 import TechnicalExpertiseSection from "@/components/TechnicalExpertiseSection"
 import Navigation from "@/components/Navigation"
@@ -29,7 +28,6 @@ export default function Home() {
         <ContactSection />
       </section>
       <MusicPlayer />
-      <Time />
     </main>
   )
 }

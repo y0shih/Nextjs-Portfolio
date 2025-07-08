@@ -1,33 +1,34 @@
-"use client"
-import React from 'react'
-import { Code, Database, Rocket, Users } from 'lucide-react'
+"use client";
+import React from "react";
+import { Code, Database, Rocket, Users } from "lucide-react";
 
-import { motion } from 'framer-motion'
-import PortfolioCard from './PortfolioCard'
+import { motion } from "framer-motion";
+import PortfolioCard from "./PortfolioCard";
 
 const AboutSection: React.FC = () => {
   const skills = [
     {
       icon: Code,
-      title: "Development",
-      description: "Proficient in React, TypeScript, Node.js, and modern web technologies. Building scalable applications with clean, maintainable code."
+      title: "Frontend Developer",
+      description:
+        "React, TypeScript, modern UI design, responsive and scalable interfaces.",
+    },
+    {
+      icon: Code,
+      title: "Backend Developer",
+      description: "Node.js, Nest.js, Python, REST APIs, authentication and backend architecture.",
     },
     {
       icon: Database,
-      title: "Database Management",
-      description: "Proficient in SQL and NoSQL databases. Experience with database design, optimization, and performance tuning."
+      title: "Database Engineer",
+      description: "SQL & NoSQL, schema design, performance tuning.",
     },
     {
       icon: Rocket,
-      title: "Performance",
-      description: "Optimizing applications for speed and efficiency. Experienced in modern build tools, deployment strategies, and performance monitoring."
+      title: "DevOps / Scripting",
+      description: "CI/CD, build optimization, automation scripts, deployment.",
     },
-    {
-      icon: Users,
-      title: "Collaboration",
-      description: "Strong team player with excellent communication skills. Experience working in agile environments and leading development teams."
-    }
-  ]
+  ];
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -35,9 +36,9 @@ const AboutSection: React.FC = () => {
       opacity: 1,
       transition: {
         staggerChildren: 0.2,
-        delayChildren: 0.3
-      }
-    }
+        delayChildren: 0.3,
+      },
+    },
   };
 
   const itemVariants = {
@@ -47,9 +48,9 @@ const AboutSection: React.FC = () => {
       y: 0,
       transition: {
         duration: 0.5,
-        ease: "easeOut"
-      }
-    }
+        ease: "easeOut",
+      },
+    },
   };
 
   // const statsVariants = {
@@ -65,9 +66,9 @@ const AboutSection: React.FC = () => {
   // };
 
   return (
-    <section className="h-screen py-12 px-6 bg-black backdrop-blur-sm relative flex items-center">
+    <section className="min-h-screen py-12 px-6 bg-black backdrop-blur-sm relative flex items-center">
       <div className="absolute inset-0 from-black/50 -z-10" />
-      <motion.div 
+      <motion.div
         className="max-w-6xl mx-auto w-full"
         initial="hidden"
         whileInView="visible"
@@ -75,37 +76,38 @@ const AboutSection: React.FC = () => {
         variants={containerVariants}
       >
         {/* Section Header */}
-        <motion.div 
-          className="text-center mb-8"
-          variants={itemVariants}
-        >
-          <motion.h2 
+        <motion.div className="text-center mb-8" variants={itemVariants}>
+          <motion.h2
             className="text-3xl md:text-4xl font-bold mb-4 glow-text"
             whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.2 }}
           >
             About Me
           </motion.h2>
-          <motion.p 
+          <motion.p
             className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed"
             variants={itemVariants}
           >
-            I&apos;m a backend-focused developer with a background in data analysis. I specialize in building efficient APIs, managing databases, and deploying scalable systems using Node.js, TypeScript, Python and PostgreSQL. Passionate about clean code and continuous learning.
+            I&apos;m a backend-focused developer with a background in data
+            analysis. I specialize in building efficient APIs, managing
+            databases and optimizing application performance. My passion lies in
+            creating scalable solutions that enhance user experiences and drive
+            business success.
           </motion.p>
         </motion.div>
 
         {/* Skills Grid */}
-        <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 gap-4"
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
           variants={containerVariants}
         >
           {skills.map((skill, index) => (
             <motion.div
               key={skill.title}
               variants={itemVariants}
-              whileHover={{ 
+              whileHover={{
                 scale: 1.02,
-                transition: { duration: 0.2 }
+                transition: { duration: 0.2 },
               }}
             >
               <PortfolioCard
@@ -154,10 +156,10 @@ const AboutSection: React.FC = () => {
               </motion.div>
             ))}
           </div> */}
-        {/* </motion.div> */} 
+        {/* </motion.div> */}
       </motion.div>
     </section>
-  )
-}
+  );
+};
 
-export default AboutSection 
+export default AboutSection;
